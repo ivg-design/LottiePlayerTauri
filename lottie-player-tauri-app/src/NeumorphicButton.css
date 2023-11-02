@@ -1,0 +1,39 @@
+.neu-button {
+    background: #282828;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px #1a1a1a, -5px -5px 10px #363636;
+    transition: all 300ms ease-in-out;
+    color: white;
+    font-size: 16px;
+}
+
+.neu-button:hover {
+box-shadow: 2px 2px 5px #1a1a1a, -2px -2px 5px #363636;
+}
+
+.neu-button:active {
+    box-shadow: inset 2px 2px 5px #1a1a1a, inset -2px -2px 5px #363636;
+}
+
+.neu-button-sidebar {
+    margin-top:10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    background-color: #444;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px #363636, -5px -5px 10px #5b5b5b;
+    transition: all 300ms ease-in-out;
+    color: white;
+    font-size: 16px;
+}
+.neu-button-sidebar:hover {
+box-shadow: 2px 2px 5px #363636, -2px -2px 5px #5b5b5b;
+}
+
+.neu-button-sidebar:active {
+    box-shadow: inset 2px 2px 5px #363636, inset -2px -2px 5px #5b5b5b;
+}

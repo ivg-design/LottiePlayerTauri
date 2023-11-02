@@ -1,0 +1,95 @@
+.App {
+  background-color: #282828;
+  color: white;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+}
+
+.appLayout {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar {
+  position:relative;
+  overflow-x: hidden !important;
+  flex-shrink: 0;
+  background-color: #444;
+  height: 100%;
+  width: 200px;
+  overflow-y: auto;
+  user-select: none;
+}
+.sidebar-header{
+  position:sticky;
+  top:0;
+}
+.sidebar-content {
+  height: calc(100vh - 40px);
+  /* Adjust the height based on your sidebar-header's height */
+}
+.mainArea {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.buttonContainer {
+  padding-top: 20px;
+}
+
+/* Additional styles for the tree nodes if needed */
+.treeNode {
+  cursor: pointer;
+  padding-left: 25px;
+  display: flex;
+  align-items: left;
+  width: auto;
+  white-space: nowrap;
+  /* Add this if you want to align the icons with the text vertically */
+}
+
+/* Styles for the main title */
+h1 {
+  font-weight: bold;
+  font-size: 2rem;
+  /* Add more Neumorphic styles here */
+}
+.resize-handle {
+  width: 10px;
+  /* Make it a bit wider to ensure it's easily grabbable */
+  height: 100%;
+  background-color: #666;
+  /* Use a darker color for visibility */
+  position: absolute;
+  top: 0;
+  right: -5px;
+  /* Half of the width to make some of it "stick out" */
+  cursor: ew-resize;
+  z-index: 10;
+  /* Ensure it's above other elements */
+}
+
+/* Font Awesome icons */
+.treeNode i.fa {
+  font-size: 14px;
+  /* Smaller size */
+  margin-right: 5px;
+  /* Margin between icon and text */
+}
+
+/* Highlight selected folder/file */
+.treeNode.selected {
+  background-color: rgb(46, 46, 46);
+}
+
+/* Hide text selection highlight */
+.treeNode::selection {
+  background: transparent;
+}
