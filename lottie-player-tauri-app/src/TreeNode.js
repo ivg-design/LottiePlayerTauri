@@ -1,23 +1,38 @@
 import React, { useState } from 'react';
-import { sortItems } from './utils';
+import { invoke } from '@tauri-apps/api/tauri'
+import { debug } from './utils';
 
-export const TreeNode = React.forwardRef(({
+
+// Helper function to sort items
+const sortItems = (items) => {
+    return items.sort((a, b) => {
+        if (a.is_dir && !b.is_dir) return -1;
+        if (!a.is_dir && b.is_dir) return 1;
+        return a.name.localeCompare(b.name);
+    });
+};
+
+// TreeNode component
+const TreeNode = React.forwardRef(({
     item,
     level = 0,
     onSelected,
     isSelected,
     onExpand,
     onCollapse,
-    expandedPaths
+    expandedPaths,
+    debug
 }, ref) => {
     const [children, setChildren] = useState([]);
     const isExpanded = expandedPaths.includes(item.path);
 
-    const handleToggle = async () => {
+    const handleToggle = async (e) => {
+        e.stopPropagation();
         if (!isExpanded && item.is_dir) {
             try {
-                const result = await window.api.readDir(item.path);
-                setChildren(sortItems(result));
+                const result = await invoke('read_dir', { path: item.path });
+                const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result));
+                setChildren(sortedChildren);
                 onExpand(item.path);
             } catch (error) {
                 console.error('Error reading directory:', error);
@@ -27,7 +42,8 @@ export const TreeNode = React.forwardRef(({
         }
     };
 
-    const handleClick = () => {
+    const handleClick = (e) => {
+        e.stopPropagation();
         onSelected(item.path);
     };
 
@@ -66,6 +82,7 @@ export const TreeNode = React.forwardRef(({
                             onExpand={onExpand}
                             onCollapse={onCollapse}
                             expandedPaths={expandedPaths}
+                            debug={debug}
                         />
                     ))}
                 </div>
@@ -73,3 +90,5 @@ export const TreeNode = React.forwardRef(({
         </div>
     );
 });
+
+export default TreeNode;

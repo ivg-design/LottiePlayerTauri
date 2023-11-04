@@ -6,9 +6,11 @@ pub const MAC_HIDDEN_DIRS: &[&str] = &[
     "/.Spotlight-V100", "/.fseventsd", "/.vol", "/.Trashes",
     "/.DocumentRevisions-V100", "/.DS_Store", "/.TemporaryItems",
     "/.PKInstallSandboxManager", "/.PKInstallSandboxManager-SystemSoftware",
-    "/.LSOverride", "/home", "/net", "/Network", "/.file", "/Volumes","/dev","/opt"
+    "/.LSOverride", "/home", "/net", "/Network", "/.file", "/Volumes", "/dev", "/opt",
+    "/Users/Deleted Users", "/Users/Shared", "/Users/Guest",
     // Add any other root directories you want to hide
 ];
+
 
 // User-specific directories that should be considered hidden on macOS
 pub const MAC_HIDDEN_USER_DIRS: &[&str] = &[
