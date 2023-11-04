@@ -24,6 +24,6 @@ jobs:
         run: npm ci  # Use npm ci for installing exact versions from package-lock.json
 
       - name: Semantic Release
-        uses: npx semantic-release
+        run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GHRELEASE }}
