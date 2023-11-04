@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.0.0...v1.0.1) (2023-11-04)
+
+
+### Performance Improvements
+
+* working on debugging treenode view ([0dfa131](https://github.com/ivg-design/LottiePlayerTauri/commit/0dfa131e06a3ad604e0b05ae3aedf3ac0291a3fb))
+
 # 1.0.0 (2023-11-04)
 
 
