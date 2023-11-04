@@ -36,6 +36,9 @@
     ]
   },
   "devDependencies": {
-    "react-app-rewired": "^2.2.1"
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "react-app-rewired": "^2.2.1",
+    "semantic-release": "^22.0.7"
   }
 }
