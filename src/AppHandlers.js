@@ -3,7 +3,12 @@ import { open } from '@tauri-apps/api/dialog';
 import { debug } from './utils';
 
 
-export const useHandlers = ({ setSelectedPath, setExpandedPaths, debug }) => {
+export const useHandlers = ({ setSelectedPath, setExpandedPaths, selectedPath, debug }) => {
+    // Define isSelected as a function
+    const isSelected = (path) => {
+        return selectedPath === path;
+    };
+
     const handleSelect = (path) => {
         setSelectedPath(path);
         const pathSegments = path.split('/');
@@ -14,8 +19,8 @@ export const useHandlers = ({ setSelectedPath, setExpandedPaths, debug }) => {
         }, []);
 
         setExpandedPaths(pathsToExpand);
-        debug('Selected path:', path);
-        debug('Expanded paths:', pathsToExpand);
+        debug && debug('Selected path:', path);
+        debug && debug('Expanded paths:', pathsToExpand);
     };
 
     const handleChooseFile = async () => {
@@ -34,7 +39,7 @@ export const useHandlers = ({ setSelectedPath, setExpandedPaths, debug }) => {
                     handleSelect(directoryPath);
                 }
             } else {
-                debug('No file or folder selected');
+                debug && debug('No file or folder selected');
             }
         } catch (error) {
             console.error('Error opening file dialog:', error);
@@ -42,19 +47,26 @@ export const useHandlers = ({ setSelectedPath, setExpandedPaths, debug }) => {
     };
 
     const handleExpand = (path) => {
-        setExpandedPaths((prevPaths) => [...prevPaths, path]);
-        debug('Expanded path:', path);
+        setExpandedPaths((prevPaths) => {
+            const newPaths = prevPaths.includes(path) ? prevPaths : [...prevPaths, path];
+            debug && debug('Expanded path:', path);
+            return newPaths;
+        });
     };
 
     const handleCollapse = (path) => {
-        setExpandedPaths((prevPaths) => prevPaths.filter((p) => p !== path));
-        debug('Collapsed path:', path);
+        setExpandedPaths((prevPaths) => {
+            const newPaths = prevPaths.filter((p) => p !== path);
+            debug && debug('Collapsed path:', path);
+            return newPaths;
+        });
     };
 
     return {
         handleSelect,
         handleExpand,
         handleCollapse,
-        handleChooseFile
+        handleChooseFile,
+        isSelected // Now we return it so it can be passed down
     };
 };

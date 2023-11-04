@@ -1,27 +1,25 @@
 import React, { useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/tauri';
 import { debug } from './utils';
+import { sortItems } from './utils';
 
-
-// Helper function to sort items
-const sortItems = (items) => {
-    return items.sort((a, b) => {
-        if (a.is_dir && !b.is_dir) return -1;
-        if (!a.is_dir && b.is_dir) return 1;
-        return a.name.localeCompare(b.name);
-    });
-};
-
+// // Helper function to sort items
+// const sortItems = (items) => {
+//     return items.sort((a, b) => {
+//         if (a.is_dir && !b.is_dir) return -1;
+//         if (!a.is_dir && b.is_dir) return 1;
+//         return a.name.localeCompare(b.name);
+//     });
+// };
 // TreeNode component
-const TreeNode = React.forwardRef(({
+const TreeNode = ({
     item,
     level = 0,
     onSelected,
-    isSelected,
+    isSelected, // This is a function now
     onExpand,
     onCollapse,
-    expandedPaths,
-    debug
+    expandedPaths
 }, ref) => {
     const [children, setChildren] = useState([]);
     const isExpanded = expandedPaths.includes(item.path);
@@ -52,8 +50,7 @@ const TreeNode = React.forwardRef(({
     return (
         <div>
             <div
-                ref={isSelected(item.path) ? ref : null}
-                className={`treeNode ${isSelected(item.path) ? 'selected' : ''}`}
+                className={`treeNode ${isSelected(item.path) ? 'selected' : ''}`} // Use the function here
                 onClick={handleClick}
                 onDoubleClick={handleToggle}
                 style={{ paddingLeft: `${level * indentSize}px` }}
@@ -78,17 +75,16 @@ const TreeNode = React.forwardRef(({
                             item={child}
                             level={level + 1}
                             onSelected={onSelected}
-                            isSelected={isSelected}
+                            isSelected={isSelected} // Pass the function
                             onExpand={onExpand}
                             onCollapse={onCollapse}
                             expandedPaths={expandedPaths}
-                            debug={debug}
                         />
                     ))}
                 </div>
             )}
         </div>
     );
-});
+};
 
 export default TreeNode;

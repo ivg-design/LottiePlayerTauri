@@ -35,11 +35,13 @@ const App = () => {
 	const [expandedPaths, setExpandedPaths] = useState([]);
 	const selectedRef = useRef(null);
 
-	const { handleSelect, handleExpand, handleCollapse, handleChooseFile } = useHandlers({
+	const { handleSelect, handleExpand, handleCollapse, handleChooseFile, isSelected } = useHandlers({
 		setSelectedPath,
 		setExpandedPaths,
-		debug,
+		selectedPath, // Assuming this is the state that holds the current selected path
+		debug
 	});
+
 
 	useFetchDirEffect(setFolderStructure, debug);
 	useScrollToSelectedEffect(selectedRef, selectedPath);

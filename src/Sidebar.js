@@ -1,19 +1,18 @@
 // sidebar.js
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import TreeNode from './TreeNode';
 import './NeumorphicButton.css';
 import { debug } from './utils';
 
-
 const Sidebar = ({
     folderStructure,
     handleSelect,
-    isSelected,
+    isSelected, // This should be a function
     handleExpand,
     handleCollapse,
     expandedPaths,
     handleChooseFile,
-    debug
+    selectedPath // This prop should be passed down from App.js to indicate the currently selected path
 }) => {
     const [sidebarWidth, setSidebarWidth] = useState(440);
     const [collapsed, setCollapsed] = useState(true);
@@ -35,7 +34,7 @@ const Sidebar = ({
         }
     }, [isResizing]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         window.addEventListener('mousemove', resize);
         window.addEventListener('mouseup', stopResizing);
 
@@ -45,9 +44,13 @@ const Sidebar = ({
         };
     }, [resize, stopResizing]);
 
-    if (debug) {
-        console.log('Sidebar render', { folderStructure, collapsed, sidebarWidth });
-    }
+    // Effect to handle the expansion of the tree based on the selected path
+    useEffect(() => {
+        if (selectedPath && folderStructure.length > 0) {
+            // Logic to ensure the tree is expanded to show the selected path
+            handleExpand(selectedPath);
+        }
+    }, [selectedPath, folderStructure, handleExpand]);
 
     return (
         <div className="sidebar" style={{ width: `${sidebarWidth}px` }}>
@@ -55,9 +58,9 @@ const Sidebar = ({
                 <button
                     onClick={() => {
                         setCollapsed(!collapsed);
-                        setIsTreeToggled(!isTreeToggled); // This toggles the button state
+                        setIsTreeToggled(!isTreeToggled);
                     }}
-                    className={`button ${isTreeToggled ? "button-toggled" : ""}`} // Apply the toggled class based on the state
+                    className={`button ${isTreeToggled ? "button-toggled" : ""}`}
                 >
                     Toggle Tree
                 </button>
@@ -71,7 +74,7 @@ const Sidebar = ({
                         key={index}
                         item={item}
                         onSelected={handleSelect}
-                        isSelected={isSelected}
+                        isSelected={isSelected} // Pass the function
                         onExpand={handleExpand}
                         onCollapse={handleCollapse}
                         expandedPaths={expandedPaths}
