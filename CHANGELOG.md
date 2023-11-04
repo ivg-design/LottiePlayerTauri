@@ -1,3 +1,10 @@
+# 1.0.0 (2023-11-04)
+
+
+### Bug Fixes
+
+* autorelease update [#9](https://github.com/ivg-design/LottiePlayerTauri/issues/9) ([a525729](https://github.com/ivg-design/LottiePlayerTauri/commit/a52572937ffb1366bff8e9aeb2411cdeb3eb8d33))
+
 # Changelog
 
 All notable changes to this project will be documented in this file .
