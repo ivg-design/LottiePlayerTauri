@@ -7,21 +7,19 @@
   display: flex;
   flex-direction: row;
 }
-
 .appLayout {
   display: flex;
   flex-direction: row;
   width: 100%;
   height: 100%;
 }
-
 .sidebar {
   position:relative;
   overflow-x: hidden !important;
   flex-shrink: 0;
-  background-color: #444;
+  background-color: #20222C;
   height: 100%;
-  width: 200px;
+  width: 440px;
   overflow-y: auto;
   user-select: none;
 }
@@ -43,9 +41,10 @@
 .buttonContainer {
   padding-top: 20px;
 }
-
 /* Additional styles for the tree nodes if needed */
 .treeNode {
+  margin-left: 10px;
+  margin-bottom:2px;
   cursor: pointer;
   padding-left: 25px;
   display: flex;
@@ -54,7 +53,6 @@
   white-space: nowrap;
   /* Add this if you want to align the icons with the text vertically */
 }
-
 /* Styles for the main title */
 h1 {
   font-weight: bold;
@@ -75,7 +73,6 @@ h1 {
   z-index: 10;
   /* Ensure it's above other elements */
 }
-
 /* Font Awesome icons */
 .treeNode i.fa {
   font-size: 14px;
@@ -83,13 +80,90 @@ h1 {
   margin-right: 5px;
   /* Margin between icon and text */
 }
-
 /* Highlight selected folder/file */
 .treeNode.selected {
   background-color: rgb(46, 46, 46);
 }
-
 /* Hide text selection highlight */
 .treeNode::selection {
   background: transparent;
 }
+/* elements styling dark neumorphism */
+.button{
+  margin-top: 20px; 
+  margin-left: 30px;
+  margin-bottom:20px;
+  width: 175px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  border: 0px solid rgba(32, 34, 44, 0.30);
+  background: linear-gradient(180deg, #3B3D4B 0%, #272934 100%);
+  box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
+  transition: all 300ms ease-in-out;
+  color: #FFF;
+  text-align: center;
+  font-family: Inter;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  cursor: pointer;
+}
+.button:not(.button-toggled):hover {
+  width: 175px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  border: 2px solid rgba(32, 34, 44, 0.30);
+  background: linear-gradient(180deg, #3B3D4B 0%, #272934 100%);
+  box-shadow: 4px 4px 7.5px 0px #14151D, -3px -3px 7.5px 0px #303240;
+  transition: all 300ms ease-in-out;
+}
+.button:active {
+  width: 175px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  border: 2px solid #FFD739;
+  background: linear-gradient(180deg, #B97208 0%, #FFD800 100%);
+  box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
+  color: #20222C;
+  text-align: center;
+  font-family: Inter;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  transition: all 300ms ease-in-out;
+
+}
+.button:disabled{
+  width: 200px;
+  height: 50px;
+  flex-shrink: 0;
+  border-radius: 15px;
+  border: 2px solid rgba(32, 34, 44, 0.30);
+  background: linear-gradient(180deg, #3B3D4B 0%, #272934 100%);
+  box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
+  transition: all 300ms ease-in-out;
+}
+.button-toggled{
+    width: 175px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    border: 2px solid #FFD739;
+    background: linear-gradient(180deg, #B97208 0%, #FFD800 100%);
+    box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
+    color: #20222C;
+    text-align: center;
+    font-family: Inter;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    transition: all 300ms ease-in-out;
+
+  }
+

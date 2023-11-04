@@ -94,12 +94,14 @@ const TreeNode = React.forwardRef(({
 // App component
 const App = () => {
 	const [folderStructure, setFolderStructure] = useState([]);
-	const [sidebarWidth, setSidebarWidth] = useState(200);
+	const [sidebarWidth, setSidebarWidth] = useState(440);
 	const [collapsed, setCollapsed] = useState(true);
 	const [isResizing, setIsResizing] = useState(false);
 	const [selectedPath, setSelectedPath] = useState(null);
 	const [expandedPaths, setExpandedPaths] = useState([]);
 	const selectedRef = useRef(null);
+	const [isTreeToggled, setIsTreeToggled] = useState(false);
+
 	
 	useEffect(() => {
 		const fetchDir = async () => {
@@ -223,10 +225,16 @@ const App = () => {
 		<div className="App">
 			<div className="sidebar" style={{ width: `${sidebarWidth}px` }}>
 				<div className="sidebar-header">
-					<button onClick={() => setCollapsed(!collapsed)} className="neu-button-sidebar">
+					<button
+						onClick={() => {
+							setCollapsed(!collapsed);
+							setIsTreeToggled(!isTreeToggled); // This toggles the button state
+						}}
+						className={`button ${isTreeToggled ? "button-toggled" : ""}`} // Apply the toggled class based on the state
+					>
 						Toggle Tree
 					</button>
-					<button onClick={handleChooseFile} className="neu-button-sidebar">
+					<button onClick={handleChooseFile} className="button">
 						Choose File/Folder
 					</button>
 				</div>
@@ -235,7 +243,7 @@ const App = () => {
 						<TreeNode
 							key={index}
 							item={item}
-							ref={isSelected(item.path) ? selectedRef : null} // Pass the ref here
+							ref={isSelected(item.path) ? selectedRef : null}
 							onSelected={handleSelect}
 							isSelected={isSelected}
 							onExpand={handleExpand}
@@ -251,6 +259,7 @@ const App = () => {
 			</div>
 		</div>
 	);
+
 };
 
 export default App;
