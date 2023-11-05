@@ -1,48 +1,48 @@
+// TreeNode.js
 import React, { useState } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
-import { debug } from './utils';
-import { sortItems } from './utils';
+import { debug, sortItems } from './utils';
 
-// // Helper function to sort items
-// const sortItems = (items) => {
-//     return items.sort((a, b) => {
-//         if (a.is_dir && !b.is_dir) return -1;
-//         if (!a.is_dir && b.is_dir) return 1;
-//         return a.name.localeCompare(b.name);
-//     });
-// };
 // TreeNode component
 const TreeNode = ({
     item,
     level = 0,
     onSelected,
-    isSelected, // This is a function now
+    isSelected,
     onExpand,
     onCollapse,
-    expandedPaths
-}, ref) => {
+    expandedPaths // [/, /userus, /userus/ivg, / ]
+}) => {
     const [children, setChildren] = useState([]);
     const isExpanded = expandedPaths.includes(item.path);
+    const expand = async (item) => { 
+        const result = await invoke('read_dir', { path: item.path });
+        const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result));
+        setChildren(sortedChildren);
+        onExpand(item.path);
+    };
+    isExpanded && expand(item);
 
+    debug('TreeNode render', { path: item.path, isExpanded, expendedPaths: expandedPaths });
     const handleToggle = async (e) => {
         e.stopPropagation();
         if (!isExpanded && item.is_dir) {
             try {
-                const result = await invoke('read_dir', { path: item.path });
-                const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result));
-                setChildren(sortedChildren);
-                onExpand(item.path);
+                expand(item);  
             } catch (error) {
                 console.error('Error reading directory:', error);
+                debug('Error reading directory:', item.path, error);
             }
         } else {
             onCollapse(item.path);
+            debug('Directory collapsed:', item.path);
         }
     };
 
     const handleClick = (e) => {
         e.stopPropagation();
         onSelected(item.path);
+        debug('Item selected:', item.path);
     };
 
     const indentSize = 20;
@@ -50,7 +50,7 @@ const TreeNode = ({
     return (
         <div>
             <div
-                className={`treeNode ${isSelected(item.path) ? 'selected' : ''}`} // Use the function here
+                className={`treeNode ${isSelected(item.path) ? 'selected' : ''}`}
                 onClick={handleClick}
                 onDoubleClick={handleToggle}
                 style={{ paddingLeft: `${level * indentSize}px` }}
@@ -75,7 +75,7 @@ const TreeNode = ({
                             item={child}
                             level={level + 1}
                             onSelected={onSelected}
-                            isSelected={isSelected} // Pass the function
+                            isSelected={isSelected}
                             onExpand={onExpand}
                             onCollapse={onCollapse}
                             expandedPaths={expandedPaths}

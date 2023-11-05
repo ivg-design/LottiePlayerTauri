@@ -12,15 +12,17 @@ export const useHandlers = ({ setSelectedPath, setExpandedPaths, selectedPath, d
     const handleSelect = (path) => {
         setSelectedPath(path);
         const pathSegments = path.split('/');
-        const pathsToExpand = pathSegments.slice(0, -1).reduce((acc, segment, index) => {
+        const pathsToExpand = pathSegments.
+            // slice(0, -1).
+            reduce((acc, segment, index) => {
             const path = acc.length === 0 ? segment : `${acc[index - 1]}/${segment}`;
             acc.push(path);
             return acc;
         }, []);
 
         setExpandedPaths(pathsToExpand);
-        debug && debug('Selected path:', path);
-        debug && debug('Expanded paths:', pathsToExpand);
+        // debug && debug('Selected path:', path);
+        // debug && debug('Expanded paths:', pathsToExpand);
     };
 
     const handleChooseFile = async () => {
@@ -32,9 +34,10 @@ export const useHandlers = ({ setSelectedPath, setExpandedPaths, selectedPath, d
                 try {
                     await invoke('read_dir', { path: result });
                     handleSelect(result);
-                } catch {
+                } catch  {
+                    // this will be executed for files 
                     const pathSegments = result.split('/');
-                    pathSegments.pop();
+                    pathSegments.pop(); //pop the file name
                     const directoryPath = pathSegments.join('/');
                     handleSelect(directoryPath);
                 }
@@ -55,6 +58,7 @@ export const useHandlers = ({ setSelectedPath, setExpandedPaths, selectedPath, d
     };
 
     const handleCollapse = (path) => {
+        
         setExpandedPaths((prevPaths) => {
             const newPaths = prevPaths.filter((p) => p !== path);
             debug && debug('Collapsed path:', path);

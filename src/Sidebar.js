@@ -7,12 +7,12 @@ import { debug } from './utils';
 const Sidebar = ({
     folderStructure,
     handleSelect,
-    isSelected, // This should be a function
+    isSelected,
     handleExpand,
     handleCollapse,
     expandedPaths,
     handleChooseFile,
-    selectedPath // This prop should be passed down from App.js to indicate the currently selected path
+    selectedPath,
 }) => {
     const [sidebarWidth, setSidebarWidth] = useState(440);
     const [collapsed, setCollapsed] = useState(true);
@@ -47,10 +47,12 @@ const Sidebar = ({
     // Effect to handle the expansion of the tree based on the selected path
     useEffect(() => {
         if (selectedPath && folderStructure.length > 0) {
-            // Logic to ensure the tree is expanded to show the selected path
+            debug('Expanding to show selected path:', selectedPath);
             handleExpand(selectedPath);
         }
     }, [selectedPath, folderStructure, handleExpand]);
+
+    // debug('Sidebar render', { folderStructure });
 
     return (
         <div className="sidebar" style={{ width: `${sidebarWidth}px` }}>
@@ -59,6 +61,7 @@ const Sidebar = ({
                     onClick={() => {
                         setCollapsed(!collapsed);
                         setIsTreeToggled(!isTreeToggled);
+                        debug('Tree toggle:', !collapsed);
                     }}
                     className={`button ${isTreeToggled ? "button-toggled" : ""}`}
                 >
@@ -69,17 +72,21 @@ const Sidebar = ({
                 </button>
             </div>
             {!collapsed &&
-                folderStructure.map((item, index) => (
-                    <TreeNode
-                        key={index}
-                        item={item}
-                        onSelected={handleSelect}
-                        isSelected={isSelected} // Pass the function
-                        onExpand={handleExpand}
-                        onCollapse={handleCollapse}
-                        expandedPaths={expandedPaths}
-                    />
-                ))}
+                folderStructure.map((item, index) => {
+                    console.log(item);
+                    return (
+                    
+                        <TreeNode
+                            key={index}
+                            item={item}
+                            onSelected={handleSelect}
+                            isSelected={isSelected}
+                            onExpand={handleExpand}
+                            onCollapse={handleCollapse}
+                            expandedPaths={expandedPaths}
+                        />
+                    );
+                })}
             <div className="resize-handle" onMouseDown={startResizing} />
         </div>
     );

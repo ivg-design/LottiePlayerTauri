@@ -11,6 +11,10 @@
   },
   "tauri": {
     "allowlist": {
+      "fs" :{
+        "scope": ["**"],
+"readDir": true
+      },
       "all": false,
         "dialog": {
           "all": true,
