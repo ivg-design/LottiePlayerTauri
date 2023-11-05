@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.0.1...v1.0.2) (2023-11-05)
+
+
+### Bug Fixes
+
+* an unpdate that allows for the tree to open ([248066b](https://github.com/ivg-design/LottiePlayerTauri/commit/248066b7c48cc4ab412945bcc8f61ab6b2f584aa))
+
 ## [1.0.1](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.0.0...v1.0.1) (2023-11-04)
 
 
