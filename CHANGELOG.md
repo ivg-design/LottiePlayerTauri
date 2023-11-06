@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.0.2...v1.1.0) (2023-11-06)
+
+
+### Bug Fixes
+
+* tree open/close ([ba506cf](https://github.com/ivg-design/LottiePlayerTauri/commit/ba506cf9a6fd8e00dcd608952e94daef3f98952a))
+
+
+### Features
+
+* added bodymovin player with versioning ([d0f8b7f](https://github.com/ivg-design/LottiePlayerTauri/commit/d0f8b7fe5f1fb0bbf5baf7f4054f53693bef487e))
+
 ## [1.0.2](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.0.1...v1.0.2) (2023-11-05)
 
 
