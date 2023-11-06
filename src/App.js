@@ -1,67 +1,318 @@
-/*
-	App.js
-		|
-		+-- AppHandlers.js --+--> utils.js
-		|                    |
-		|                    +--> (Other potential dependencies)
-		|
-		+-- AppEffects.js ---+--> utils.js
-		|                    |
-		|                    +--> (Other potential dependencies)
-		|
-		+-- Sidebar.js ------+--> TreeNode.js
-		|   |                    |
-		|   |                    +--> utils.js
-		|   |                    |
-		|   |                    +--> (Other potential dependencies)
-		|   |
-		|   +--> utils.js
-		|
-		+-- MainApp.js
-*/
-
-import React, { useState, useRef } from 'react';
-import Sidebar from './Sidebar';
-import MainApp from './MainApp';
-import { useFetchDirEffect, useScrollToSelectedEffect } from './AppEffects';
-import { useHandlers } from './AppHandlers';
-import { debug } from './utils';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { invoke } from '@tauri-apps/api/tauri';
+import { open } from '@tauri-apps/api/dialog';
 import 'font-awesome/css/font-awesome.min.css';
+import './NeumorphicButton.css';
 import './App.css';
 
+// Helper function to sort items
+const sortItems = (items) => {
+	return items.sort((a, b) => {
+		if (a.is_dir && !b.is_dir) return -1;
+		if (!a.is_dir && b.is_dir) return 1;
+		return a.name.localeCompare(b.name);
+	});
+};
+
+// TreeNode component
+const TreeNode = React.forwardRef(({
+		item,
+		level = 0,
+		onSelected,
+		isSelected,
+		onExpand,
+		onCollapse,
+		expandedPaths
+	}, ref) => {
+		const [children, setChildren] = useState([]);
+		const isExpanded = expandedPaths.includes(item.path);
+		
+
+	// Update your expand function
+	const expand = useCallback(async (item) => {
+		if (item.is_dir && !isExpanded) {
+			try {
+				const result = await invoke('read_dir', { path: item.path });
+				const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result));
+				setChildren(sortedChildren);
+				onExpand(item.path);
+			} catch (error) {
+				console.error('Error reading directory:', error);
+			}
+		}
+	}, [item.is_dir, item.path, isExpanded, onExpand]);
+
+	// Updated collapse function
+	const collapse = useCallback(() => {
+		if (isExpanded) {
+			setChildren([]);
+			onCollapse(item.path);
+		}
+	}, [item.path, isExpanded, onCollapse]);
+
+	// useEffect(() => {
+	// 	if (isExpanded) {
+	// 		expand(item);
+	// 	} else {
+	// 		collapse();
+	// 	}
+	// }, [isExpanded, item, expand, collapse]);
+	useEffect(() => {
+		const performExpand = async () => {
+			if (item.is_dir && isExpanded) {
+				try {
+					const result = await invoke('read_dir', { path: item.path });
+					const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result));
+					setChildren(sortedChildren);
+				} catch (error) {
+					console.error('Error reading directory:', error);
+				}
+			}
+		};
+
+		performExpand();
+	}, [item, isExpanded, invoke]);
+
+	
+	const handleToggle = (e) => {
+		e.stopPropagation();
+		if (item.is_dir) {
+			if (isExpanded) {
+				collapse(); // Ensure this function is called when collapsing
+			} else {
+				expand(item).catch(console.error);
+			}
+		}
+	};
+
+
+
+		const handleClick = (e) => {
+			e.stopPropagation();
+			onSelected(item.path);
+		};
+
+		const indentSize = 20;
+
+		return (
+			<div>
+				<div
+					className={`treeNode ${isSelected(item.path) ? 'selected' : ''}`}
+					onClick={handleClick}
+					onDoubleClick={handleToggle}
+					style={{ paddingLeft: `${level * indentSize}px` }}
+				>
+					{item.is_dir ? (
+						<>
+							<i className={`fa ${isExpanded ? 'fa-folder-open' : 'fa-folder'}`} />
+							<span style={{ fontWeight: 'bold' }}>{item.name}</span>
+						</>
+					) : (
+						<>
+							<i className="fa fa-file" />
+							<span>{item.name}</span>
+						</>
+					)}
+				</div>
+				{isExpanded && (
+					<div className="treeChildren">
+						{children.map((child, index) => (
+							<TreeNode
+								key={index}
+								item={child}
+								level={level + 1}
+								onSelected={onSelected}
+								isSelected={isSelected}
+								onExpand={onExpand}
+								onCollapse={onCollapse}
+								expandedPaths={expandedPaths}
+							/>
+						))}
+					</div>
+				)}
+			</div>
+		);
+});
+
+// App component
 const App = () => {
 	const [folderStructure, setFolderStructure] = useState([]);
+	const [sidebarWidth, setSidebarWidth] = useState(440);
+	const [collapsed, setCollapsed] = useState(true);
+	const [isResizing, setIsResizing] = useState(false);
 	const [selectedPath, setSelectedPath] = useState(null);
 	const [expandedPaths, setExpandedPaths] = useState([]);
 	const selectedRef = useRef(null);
+	const [isTreeToggled, setIsTreeToggled] = useState(false);
 
-	const { handleSelect, handleExpand, handleCollapse, handleChooseFile, isSelected } = useHandlers({
-		setSelectedPath,
-		setExpandedPaths,
-		selectedPath, // Assuming this is the state that holds the current selected path
-		debug
-	});
+	
+	useEffect(() => {
+		const fetchDir = async () => {
+			const rootPath = '/'; // Use your desired initial path
+			try {
+				const result = await invoke('read_dir', { path: rootPath });
+				const sortedRoot = sortItems(Array.isArray(result) ? result : JSON.parse(result));
+				setFolderStructure(sortedRoot);
+			} catch (error) {
+				console.error('Error fetching root directory:', error);
+			}
+		};
+		fetchDir();
+	}, []);
+
+	useEffect(() => {
+		if (selectedRef.current) {
+			selectedRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+		}
+	}, [selectedPath]); // Only re-run if selectedPath changes
 
 
-	useFetchDirEffect(setFolderStructure, debug);
-	useScrollToSelectedEffect(selectedRef, selectedPath);
+	const startResizing = useCallback((e) => {
+		e.preventDefault();
+		setIsResizing(true);
+	}, []);
+
+	const stopResizing = useCallback(() => {
+		setIsResizing(false);
+	}, []);
+
+	const resize = useCallback((e) => {
+		if (isResizing) {
+			setSidebarWidth(e.clientX);
+		}
+	}, [isResizing]);
+
+	useEffect(() => {
+		window.addEventListener('mousemove', resize);
+		window.addEventListener('mouseup', stopResizing);
+
+		return () => {
+			window.removeEventListener('mousemove', resize);
+			window.removeEventListener('mouseup', stopResizing);
+		};
+	}, [resize, stopResizing]);
+
+	const isSelected = (path) => {
+		return selectedPath === path;
+	};
+
+	const handleSelect = (path) => {
+		setSelectedPath(path);
+		const pathSegments = path.split('/');
+		const pathsToExpand = pathSegments.
+			// slice(0, -1).
+			reduce((acc, segment, index) => {
+				const path = acc.length === 0 ? segment : `${acc[index - 1]}/${segment}`;
+				acc.push(path);
+				return acc;
+			}, []);
+
+		setExpandedPaths(pathsToExpand);
+		// console.log && console.log('Selected path:', path);
+		// console.log && console.log('Expanded paths:', pathsToExpand);
+	};
+
+	const handleChooseFile = async () => {
+		try {
+			const result = await open({
+				multiple: false,
+			});
+			if (typeof result === 'string') {
+				try {
+					await invoke('read_dir', { path: result });
+					handleSelect(result);
+				} catch {
+					// this will be executed for files 
+					const pathSegments = result.split('/');
+					pathSegments.pop(); //pop the file name
+					const directoryPath = pathSegments.join('/');
+					handleSelect(directoryPath);
+				}
+			} else {
+				console.log && console.log('No file or folder selected');
+			}
+		} catch (error) {
+			console.error('Error opening file dialog:', error);
+		}
+	};
+
+	const handleExpand = (path) => {
+		setExpandedPaths(prevPaths => {
+			if (!prevPaths.includes(path)) {
+				return [...prevPaths, path];
+			}
+			return prevPaths;
+		});
+	};
+
+	const handleCollapse = (path) => {
+		setExpandedPaths(prevPaths => {
+			return prevPaths.filter(p => p !== path);
+		});
+	};
+
+	const handleSelectFile = (filePath) => {
+		// This function should be responsible for selecting the file
+		// and updating the expandedPaths to include the file's parent directory
+		setSelectedPath(filePath);
+
+		const pathSegments = filePath.split('/');
+		// Remove the file name to get the directory path
+		pathSegments.pop();
+		const directoryPath = pathSegments.join('/');
+
+		// Update expanded paths to include the parent directory of the file
+		setExpandedPaths(prevPaths => {
+			const newPaths = new Set(prevPaths);
+			let cumulativePath = '';
+			for (const segment of pathSegments) {
+				cumulativePath = cumulativePath ? `${cumulativePath}/${segment}` : segment;
+				newPaths.add(cumulativePath);
+			}
+			return Array.from(newPaths);
+		});
+	};
+	
 
 	return (
 		<div className="App">
-			<Sidebar
-				folderStructure={folderStructure}
-				handleSelect={handleSelect}
-				isSelected={(path) => selectedPath === path}
-				handleExpand={handleExpand}
-				handleCollapse={handleCollapse}
-				expandedPaths={expandedPaths}
-				handleChooseFile={handleChooseFile}
-				selectedRef={selectedRef}
-				debug={debug}
-			/>
-			<MainApp />
+			<div className="sidebar" style={{ width: `${sidebarWidth}px` }}>
+				<div className="sidebar-header">
+					<button
+						onClick={() => {
+							setCollapsed(!collapsed);
+							setIsTreeToggled(!isTreeToggled); // This toggles the button state
+						}}
+						className={`button ${isTreeToggled ? "button-toggled" : ""}`} // Apply the toggled class based on the state
+					>
+						Toggle Tree
+					</button>
+					<button onClick={handleChooseFile} className="button">
+						Choose File/Folder
+					</button>
+				</div>
+				{!collapsed &&
+					folderStructure.map((item, index) => (
+						<TreeNode
+							key={index}
+							item={item}
+							ref={isSelected(item.path) ? selectedRef : null}
+							onSelected={handleSelect}
+							isSelected={isSelected}
+							onExpand={handleExpand}
+							onCollapse={handleCollapse}
+							expandedPaths={expandedPaths}
+						/>
+					))}
+				<div className="resize-handle" onMouseDown={startResizing} />
+			</div>
+			<div className="mainArea">
+				<h1>Your App Title</h1>
+				{/* Main content will go here */}
+			</div>
 		</div>
 	);
+
 };
 
 export default App;

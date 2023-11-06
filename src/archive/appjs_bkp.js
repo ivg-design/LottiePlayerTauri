@@ -26,20 +26,25 @@ const TreeNode = React.forwardRef(({
 }, ref) => {
 	const [children, setChildren] = useState([]);
 	const isExpanded = expandedPaths.includes(item.path);
-
+	const expand = async (item) => {
+		const result = await invoke('read_dir', { path: item.path });
+		const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result));
+		setChildren(sortedChildren);
+		onExpand(item.path);
+	};
+	isExpanded && expand(item);
 	const handleToggle = async (e) => {
 		e.stopPropagation();
 		if (!isExpanded && item.is_dir) {
 			try {
-				const result = await invoke('read_dir', { path: item.path });
-				const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result));
-				setChildren(sortedChildren);
-				onExpand(item.path);
+				expand(item);
 			} catch (error) {
 				console.error('Error reading directory:', error);
+				debug('Error reading directory:', item.path, error);
 			}
 		} else {
 			onCollapse(item.path);
+			debug('Directory collapsed:', item.path);
 		}
 	};
 
