@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { open } from '@tauri-apps/api/dialog';
+import { readTextFile } from '@tauri-apps/api/fs';
+import LottiePlayer from './mainAppPlayer'; // Adjust the import path based on your file structure
 import 'font-awesome/css/font-awesome.min.css';
 import './NeumorphicButton.css';
 import './App.css';
@@ -134,6 +136,7 @@ const TreeNode = React.forwardRef(({
 		);
 });
 
+
 // App component
 const App = () => {
 	const [folderStructure, setFolderStructure] = useState([]);
@@ -144,8 +147,8 @@ const App = () => {
 	const [expandedPaths, setExpandedPaths] = useState([]);
 	const selectedRef = useRef(null);
 	const [isTreeToggled, setIsTreeToggled] = useState(false);
+	const [animationData, setAnimationData] = useState(null);
 
-	
 	useEffect(() => {
 		const fetchDir = async () => {
 			const rootPath = '/'; // Use your desired initial path
@@ -165,7 +168,6 @@ const App = () => {
 			selectedRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 		}
 	}, [selectedPath]); // Only re-run if selectedPath changes
-
 
 	const startResizing = useCallback((e) => {
 		e.preventDefault();
@@ -199,34 +201,29 @@ const App = () => {
 	const handleSelect = (path) => {
 		setSelectedPath(path);
 		const pathSegments = path.split('/');
-		const pathsToExpand = pathSegments.
-			// slice(0, -1).
-			reduce((acc, segment, index) => {
-				const path = acc.length === 0 ? segment : `${acc[index - 1]}/${segment}`;
-				acc.push(path);
-				return acc;
-			}, []);
+		const pathsToExpand = pathSegments.reduce((acc, segment, index) => {
+			const path = acc.length === 0 ? segment : `${acc[index - 1]}/${segment}`;
+			acc.push(path);
+			return acc;
+		}, []);
 
 		setExpandedPaths(pathsToExpand);
-		// console.log && console.log('Selected path:', path);
-		// console.log && console.log('Expanded paths:', pathsToExpand);
 	};
 
 	const handleChooseFile = async () => {
 		try {
 			const result = await open({
 				multiple: false,
+				filters: [{ name: 'Json', extensions: ['json'] }],
 			});
 			if (typeof result === 'string') {
-				try {
-					await invoke('read_dir', { path: result });
+				// Check if the file has a .json extension
+				if (result.endsWith('.json')) {
+					const animationJson = await readTextFile(result);
+					setAnimationData(JSON.parse(animationJson));
+				} else {
+					// Handle folder selection (if needed)
 					handleSelect(result);
-				} catch {
-					// this will be executed for files 
-					const pathSegments = result.split('/');
-					pathSegments.pop(); //pop the file name
-					const directoryPath = pathSegments.join('/');
-					handleSelect(directoryPath);
 				}
 			} else {
 				console.log && console.log('No file or folder selected');
@@ -250,29 +247,6 @@ const App = () => {
 			return prevPaths.filter(p => p !== path);
 		});
 	};
-
-	const handleSelectFile = (filePath) => {
-		// This function should be responsible for selecting the file
-		// and updating the expandedPaths to include the file's parent directory
-		setSelectedPath(filePath);
-
-		const pathSegments = filePath.split('/');
-		// Remove the file name to get the directory path
-		pathSegments.pop();
-		const directoryPath = pathSegments.join('/');
-
-		// Update expanded paths to include the parent directory of the file
-		setExpandedPaths(prevPaths => {
-			const newPaths = new Set(prevPaths);
-			let cumulativePath = '';
-			for (const segment of pathSegments) {
-				cumulativePath = cumulativePath ? `${cumulativePath}/${segment}` : segment;
-				newPaths.add(cumulativePath);
-			}
-			return Array.from(newPaths);
-		});
-	};
-	
 
 	return (
 		<div className="App">
@@ -308,11 +282,10 @@ const App = () => {
 			</div>
 			<div className="mainArea">
 				<h1>Your App Title</h1>
-				{/* Main content will go here */}
+				{animationData && <LottiePlayer animationData={animationData} version="5-12-2"/>}
 			</div>
 		</div>
 	);
-
 };
 
 export default App;

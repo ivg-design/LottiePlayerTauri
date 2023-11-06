@@ -13,6 +13,7 @@
     "allowlist": {
       "fs" :{
         "scope": ["**"],
+        "readFile": true,
 "readDir": true
       },
       "all": false,
