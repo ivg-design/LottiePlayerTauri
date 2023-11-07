@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { open } from '@tauri-apps/api/dialog';
 import { readTextFile } from '@tauri-apps/api/fs';
-import LottiePlayer from './mainAppPlayer'; // Adjust the import path based on your file structure
+import PlayerUI from './PlayerUI.js'; // Import the PlayerUI component
+
 import 'font-awesome/css/font-awesome.min.css';
 import './NeumorphicButton.css';
 import './App.css';
@@ -24,7 +25,8 @@ const TreeNode = React.forwardRef(({
 		isSelected,
 		onExpand,
 		onCollapse,
-		expandedPaths
+		expandedPaths,
+		onFileSelected // This is a new prop to be passed from the App component
 	}, ref) => {
 		const [children, setChildren] = useState([]);
 		const isExpanded = expandedPaths.includes(item.path);
@@ -52,13 +54,6 @@ const TreeNode = React.forwardRef(({
 		}
 	}, [item.path, isExpanded, onCollapse]);
 
-	// useEffect(() => {
-	// 	if (isExpanded) {
-	// 		expand(item);
-	// 	} else {
-	// 		collapse();
-	// 	}
-	// }, [isExpanded, item, expand, collapse]);
 	useEffect(() => {
 		const performExpand = async () => {
 			if (item.is_dir && isExpanded) {
@@ -87,12 +82,17 @@ const TreeNode = React.forwardRef(({
 		}
 	};
 
+	const handleClick = (e) => {
+		e.stopPropagation();
+		onSelected(item.path); // Existing selection handling
+
+		// If the item is a file, trigger the event to load and play the animation
+		if (!item.is_dir) {
+			onFileSelected(item.path); // This is a new prop function to be passed from the App component
+		}
+	};
 
 
-		const handleClick = (e) => {
-			e.stopPropagation();
-			onSelected(item.path);
-		};
 
 		const indentSize = 20;
 
@@ -128,6 +128,8 @@ const TreeNode = React.forwardRef(({
 								onExpand={onExpand}
 								onCollapse={onCollapse}
 								expandedPaths={expandedPaths}
+								onFileSelected={onFileSelected} // Pass this prop down to recursive calls
+
 							/>
 						))}
 					</div>
@@ -148,6 +150,9 @@ const App = () => {
 	const selectedRef = useRef(null);
 	const [isTreeToggled, setIsTreeToggled] = useState(false);
 	const [animationData, setAnimationData] = useState(null);
+	const [isPlaying, setIsPlaying] = useState(false);
+	const [progress, setProgress] = useState(0);
+	const lottieRef = useRef(null);
 
 	useEffect(() => {
 		const fetchDir = async () => {
@@ -197,12 +202,32 @@ const App = () => {
 	const isSelected = (path) => {
 		return selectedPath === path;
 	};
+	const handleChooseFile = async () => {
+		try {
+			const result = await open({
+				multiple: false,
+				directory: false, // make sure it's set to false to open files
+			});
+			if (typeof result === 'string') {
+				const animationJson = await readTextFile(result);
+				setAnimationData(JSON.parse(animationJson));
+
+				// Get path segments and update tree navigation
+				const pathSegments = result.split('/');
+				pathSegments.pop(); // Remove the file name to navigate to the containing folder
+				const directoryPath = pathSegments.join('/');
+				handleSelect(directoryPath); // This should update the tree view
+			}
+		} catch (error) {
+			console.error('Error opening file dialog:', error);
+		}
+	};
 
 	const handleSelect = (path) => {
 		setSelectedPath(path);
 		const pathSegments = path.split('/');
 		const pathsToExpand = pathSegments.reduce((acc, segment, index) => {
-			const path = acc.length === 0 ? segment : `${acc[index - 1]}/${segment}`;
+			const path = index === 0 ? segment : `${acc[index - 1]}/${segment}`;
 			acc.push(path);
 			return acc;
 		}, []);
@@ -210,28 +235,6 @@ const App = () => {
 		setExpandedPaths(pathsToExpand);
 	};
 
-	const handleChooseFile = async () => {
-		try {
-			const result = await open({
-				multiple: false,
-				filters: [{ name: 'Json', extensions: ['json'] }],
-			});
-			if (typeof result === 'string') {
-				// Check if the file has a .json extension
-				if (result.endsWith('.json')) {
-					const animationJson = await readTextFile(result);
-					setAnimationData(JSON.parse(animationJson));
-				} else {
-					// Handle folder selection (if needed)
-					handleSelect(result);
-				}
-			} else {
-				console.log && console.log('No file or folder selected');
-			}
-		} catch (error) {
-			console.error('Error opening file dialog:', error);
-		}
-	};
 
 	const handleExpand = (path) => {
 		setExpandedPaths(prevPaths => {
@@ -248,6 +251,37 @@ const App = () => {
 		});
 	};
 
+	const handleFileSelected = async (filePath) => {
+		try {
+			// Check if the file has a .json extension
+			if (filePath.endsWith('.json')) {
+				const animationJson = await readTextFile(filePath);
+				setAnimationData(JSON.parse(animationJson));
+			} else {
+				console.log('Selected item is not a Lottie JSON file.');
+			}
+		} catch (error) {
+			console.error('Error reading the Lottie file:', error);
+		}
+	};
+
+	// Example of setting the animation data (you might fetch this data or import it)
+	useEffect(() => {
+		// This is where you would fetch or import your animation data
+		// For this example, let's assume you have a local file called 'animation.json'
+		const fetchAnimationData = async () => {
+			try {
+				const response = await fetch('/path/to/your/animation.json');
+				const data = await response.json();
+				setAnimationData(data);
+			} catch (error) {
+				console.error('Error fetching animation data:', error);
+			}
+		};
+
+		fetchAnimationData();
+	}, []);
+	
 	return (
 		<div className="App">
 			<div className="sidebar" style={{ width: `${sidebarWidth}px` }}>
@@ -276,13 +310,16 @@ const App = () => {
 							onExpand={handleExpand}
 							onCollapse={handleCollapse}
 							expandedPaths={expandedPaths}
+							onFileSelected={handleFileSelected} // Pass the new function as a prop to TreeNode
 						/>
 					))}
 				<div className="resize-handle" onMouseDown={startResizing} />
 			</div>
 			<div className="mainArea">
+				<div className="appName">
 				<h1>Your App Title</h1>
-				{animationData && <LottiePlayer animationData={animationData} version="5-12-2"/>}
+				</div>
+				{animationData && <PlayerUI animationData={animationData} version="5-12-2"/>}
 			</div>
 		</div>
 	);

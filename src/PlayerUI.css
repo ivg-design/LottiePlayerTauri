@@ -1,0 +1,43 @@
+/* PlayerUI.css */
+.playbackContainer {
+    margin-top: 20px;
+    margin-left: 10px;
+    /* margin-bottom: 20px; */
+    width: auto;
+    height: calc(100% - 160px);
+    /* max-height: 100vh; */
+    flex-shrink: 0;
+    border-radius: 5px;
+    border: 0px solid rgba(32, 34, 44, 0.30);
+    background: linear-gradient(180deg, #3B3D4B 0%, #272934 100%);
+    box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
+    transition: all 300ms ease-in-out;
+    color: #FFF;
+}
+
+.lottie-container {
+    width: 100%;
+    height: 100%;
+    /* Adjust as needed */
+}
+
+.player-controls {
+    padding-top:5px;
+    display: flex;
+    height:100px;
+    width:100%;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.play-pause-btn {
+    padding: 5px 15px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.progress-slider {
+    width: 100%;
+    cursor: pointer;
+}

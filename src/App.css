@@ -54,6 +54,11 @@
   /* Add this if you want to align the icons with the text vertically */
 }
 /* Styles for the main title */
+.appName {
+  font-weight: bold;
+  font-size: 2rem;
+  height:60px; /* Add more Neumorphic styles here */
+}
 h1 {
   font-weight: bold;
   font-size: 2rem;
