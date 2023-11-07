@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.1.0...v1.2.0) (2023-11-07)
+
+
+### Features
+
+* workingon integrating UI Design ([a99ee73](https://github.com/ivg-design/LottiePlayerTauri/commit/a99ee73a159d5c8a2ea71b615bd7e53879c47c9d))
+
 # [1.1.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.0.2...v1.1.0) (2023-11-06)
 
 
