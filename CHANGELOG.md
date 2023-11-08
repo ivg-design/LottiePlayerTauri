@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.2.0...v1.2.1) (2023-11-08)
+
+
+### Bug Fixes
+
+* styled play/pause btn ([b59761f](https://github.com/ivg-design/LottiePlayerTauri/commit/b59761fca38cd929357e498a1e8bdb3a9f4de7db))
+
 # [1.2.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.1.0...v1.2.0) (2023-11-07)
 
 
