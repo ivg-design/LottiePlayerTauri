@@ -1,6 +1,6 @@
 module.exports = {
     branches: [
-        { name: 'main', prerelease: 'alpha' },  // Add the prerelease property here
+        { type: 'prerelease', name: 'main', prerelease: 'alpha' },  // Add the prerelease property here
     ],
     plugins: [
         '@semantic-release/commit-analyzer',
