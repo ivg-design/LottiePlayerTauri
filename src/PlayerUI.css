@@ -32,12 +32,40 @@
 }
 
 
-
-.progress-slider {
-    width: 100%;
+.progress-bar-container {
+    position: relative;
+    width: 200px;
+    height: 25px;
+    /* Height of the progress bar */
+    /* margin-top: 10px; */
+    /* Space above the progress bar */
     cursor: pointer;
 }
 
+.progress-bar-svg {
+    width: 100%;
+    height: 8px;
+    top: 50%;
+    bottom: 50%;
+}
+
+.progress-bar-handle {
+    position: absolute;
+    top: 50%;
+    bottom: 50%;
+    transform: translate(-50%, -50%);
+    /* Center the handle on the progress bar */
+    width: 25px;
+    /* Handle width */
+    height: 25px;
+    /* Handle height */
+    cursor: grab;
+}
+
+/* Styles for when the handle is being dragged */
+.progress-bar-handle:active {
+    cursor: grabbing;
+}
 .playBtn {
     margin-top: 20px;
     margin-left: 30px;

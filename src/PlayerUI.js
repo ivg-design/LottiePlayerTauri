@@ -1,52 +1,68 @@
-// Import the necessary hooks and components from React and other libraries.
-import React, { useState, useRef, useEffect } from 'react';  // React hooks and React base import
-import LottiePlayer from './LottiePlayer'; // Importing a custom component for rendering Lottie animations
-import './PlayerUI.css'; // Importing CSS for styling the player UI
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Component for Font Awesome icons
-import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons'; // Specific icons from Font Awesome
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import LottiePlayer from './LottiePlayer';
+import './PlayerUI.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
+import { ReactComponent as ProgressBar } from './svgUIelements/progressBar.svg';
+import { ReactComponent as ProgressBarHandle } from './svgUIelements/progressBarHandle.svg';
 
-// Defining the PlayerUI component with props for animation data and version
 const PlayerUI = ({ animationData, version }) => {
-    // State hooks for play state and progress
-    const [isPlaying, setIsPlaying] = useState(true); // State for if the animation is playing
-    const [progress, setProgress] = useState(0); // State for the progress of the animation
-    const animationRef = useRef(null); // Ref hook to reference the animation DOM element
+    const [isPlaying, setIsPlaying] = useState(true);
+    const [progress, setProgress] = useState(0);
+    const animationRef = useRef(null);
+    const progressBarRef = useRef(null);
 
-    // Effect hook to handle play/pause changes
     useEffect(() => {
         if (animationRef.current) {
-            if (isPlaying) {
-                animationRef.current.play(); // Play animation if isPlaying is true
-            } else {
-                animationRef.current.pause(); // Pause animation if isPlaying is false
-            }
+            isPlaying ? animationRef.current.play() : animationRef.current.pause();
         }
-    }, [isPlaying]); // This effect depends on the isPlaying state
+    }, [isPlaying]);
 
-    // Effect hook to handle progress changes
+
     useEffect(() => {
         if (animationRef.current) {
             const frame = Math.floor(animationRef.current.totalFrames * progress);
-            animationRef.current.goToAndStop(frame, true); // Go to a specific frame based on progress
+            animationRef.current.goToAndStop(frame, true);
         }
-    }, [progress]); // This effect depends on the progress state
+    }, [progress]);
 
-    // Function to toggle the play state
-    const togglePlay = () => {
-        setIsPlaying(!isPlaying); // Sets isPlaying to the opposite of its current state
+    const togglePlay = () => setIsPlaying(!isPlaying);
+
+    const setProgressFromEvent = useCallback((e) => {
+        if (progressBarRef.current) {
+            const bounds = progressBarRef.current.getBoundingClientRect();
+            const newProgress = (e.clientX - bounds.left) / bounds.width;
+            setProgress(Math.min(Math.max(0, newProgress), 1));
+        } else {
+            console.log('progressBarRef.current is null during setProgressFromEvent');
+        }
+    }, []);
+
+    const handleMouseMove = useCallback((e) => {
+        if (progressBarRef.current) {
+            setProgressFromEvent(e);
+        } else {
+            console.log('progressBarRef.current is null during handleMouseMove');
+        }
+    }, [setProgressFromEvent]);
+
+    const handleMouseUp = useCallback(() => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+    }, [handleMouseMove]);
+
+    const handleMouseDown = useCallback((event) => {
+        event.preventDefault();
+        setProgressFromEvent(event);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    }, [setProgressFromEvent, handleMouseMove, handleMouseUp]);
+
+    // Function to update progress when animation updates
+    const handleAnimationUpdate = (animationProgress) => {
+        setProgress(animationProgress);
     };
 
-    // Function to update the progress state
-    const updateProgress = (value) => {
-        setProgress(parseFloat(value)); // Parses the string value to a float and updates the progress state
-    };
-
-    // Function to determine the button class based on the play state
-    const getButtonClass = () => {
-        return isPlaying ? "playBtn" : "pauseBtn"; // Returns the appropriate class name based on isPlaying
-    };
-
-    // The component returns a UI structure rendered as JSX
     return (
         <div className="playbackContainer">
             <LottiePlayer
@@ -55,26 +71,30 @@ const PlayerUI = ({ animationData, version }) => {
                 isPlaying={isPlaying}
                 progress={progress}
                 animationRef={animationRef}
+                onEnterFrame={({ currentTime, totalTime }) => handleAnimationUpdate(currentTime / totalTime)}
             />
             <div className="player-controls">
                 <button
-                    className={getButtonClass()}
+                    className={isPlaying ? 'playBtn' : 'pauseBtn'}
                     onClick={togglePlay}
                 >
-                    <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} /> 
-                    {isPlaying ? ' Pause' : ' Play'} 
+                    <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} />
+                    {isPlaying ? ' Pause' : ' Play'}
                 </button>
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="any"
-                    value={progress}
-                    onChange={(e) => updateProgress(e.target.value)}
-                />
+                <div
+                    className="progress-bar-container"
+                    ref={progressBarRef}
+                    onMouseDown={handleMouseDown}
+                >
+                    <ProgressBar className="progress-bar-svg" />
+                    <ProgressBarHandle
+                        className="progress-bar-handle"
+                        style={{ left: `${progress * 100}%` }}
+                    />
+                </div>
             </div>
         </div>
     );
 };
 
-export default PlayerUI; // Exports the component for use in other parts of the application
+export default PlayerUI;

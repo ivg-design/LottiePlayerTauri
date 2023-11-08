@@ -30,7 +30,8 @@ const TreeNode = React.forwardRef(({
 	}, ref) => {
 		const [children, setChildren] = useState([]);
 		const isExpanded = expandedPaths.includes(item.path);
-		
+		const itemRef = ref || React.createRef(); // Use the forwarded ref or create a new one
+
 
 	// Update your expand function
 	const expand = useCallback(async (item) => {
@@ -70,7 +71,31 @@ const TreeNode = React.forwardRef(({
 		performExpand();
 	}, [item, isExpanded, invoke]);
 
-	
+	useEffect(() => {
+		// Only scroll into view if the current item is selected and not already in view
+		if (isSelected(item.path) && !isItemInView(itemRef.current)) {
+			itemRef.current.scrollIntoView({
+				behavior: 'smooth',
+				block: 'nearest'
+			});
+		}
+	}, [isSelected, item.path, itemRef]);
+
+	// Helper function to check if the element is in view
+	function isItemInView(element) {
+		if (!element) {
+			return false;
+		}
+		const rect = element.getBoundingClientRect();
+		return (
+			rect.top >= 0 &&
+			rect.left >= 0 &&
+			rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+			rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+		);
+	}
+
+
 	const handleToggle = (e) => {
 		e.stopPropagation();
 		if (item.is_dir) {
@@ -99,6 +124,7 @@ const TreeNode = React.forwardRef(({
 		return (
 			<div>
 				<div
+					ref={itemRef} // Attach the ref to this div
 					className={`treeNode ${isSelected(item.path) ? 'selected' : ''}`}
 					onClick={handleClick}
 					onDoubleClick={handleToggle}
