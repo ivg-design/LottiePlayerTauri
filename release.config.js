@@ -2,7 +2,7 @@ module.exports = {
     branches: [
         {
             type: 'prerelease',
-            name: 'alpha',
+            name: 'main',
             prerelease: 'alpha',
         },  // Add the prerelease property here
     ],
