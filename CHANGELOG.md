@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.0...v1.3.1) (2023-11-08)
+
+
+### Bug Fixes
+
+* fix1 to prerelease versioning ([afbd58e](https://github.com/ivg-design/LottiePlayerTauri/commit/afbd58e5c91a3e3b3833dc29a35de6804b3f2d88))
+
 # [1.3.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.2.2...v1.3.0) (2023-11-08)
 
 
