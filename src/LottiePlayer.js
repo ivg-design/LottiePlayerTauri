@@ -1,10 +1,7 @@
-/* global bodymovin */
-
 import React, { useEffect, useRef } from 'react';
 
-const LottiePlayer = ({ animationData, version, isPlaying }) => {
+const LottiePlayer = ({ animationData, version, isPlaying, animationRef, onEnterFrame }) => {
     const lottieContainerRef = useRef(null);
-    const animationInstanceRef = useRef(null); // Ref to hold the instance of the animation
 
     useEffect(() => {
         // Load the Lottie script
@@ -17,39 +14,42 @@ const LottiePlayer = ({ animationData, version, isPlaying }) => {
                 container: lottieContainerRef.current,
                 renderer: 'svg',
                 loop: true,
-                autoplay: true,
+                autoplay: false, // Set to false to manage play state via React state
                 animationData: animationData,
             };
 
             // Initialize the animation and store the instance
-            animationInstanceRef.current = bodymovin.loadAnimation(params);
+            animationRef.current = window.bodymovin.loadAnimation(params);
+
+            // Add event listener to update parent component with animation progress
+            animationRef.current.addEventListener('enterFrame', () => {
+                const currentProgress = animationRef.current.currentFrame / animationRef.current.totalFrames;
+                onEnterFrame(currentProgress);
+            });
         };
 
         document.body.appendChild(script);
 
         // Cleanup function
         return () => {
+            console.log("####### destroy");
             document.body.removeChild(script);
-            if (animationInstanceRef.current) {
-                animationInstanceRef.current.destroy();
+            if (animationRef.current) {
+                animationRef.current.removeEventListener('enterFrame');
+                animationRef.current.destroy();
+                animationRef.current = null;
             }
         };
-    }, [animationData, version]);
+    }, [animationData, version, onEnterFrame, animationRef]);
 
     useEffect(() => {
-        // Play or pause the animation when isPlaying changes
-        if (animationInstanceRef.current) {
-            if (isPlaying) {
-                animationInstanceRef.current.play();
-            } else {
-                animationInstanceRef.current.pause();
-            }
+        // Play or pause the animation based on the isPlaying prop
+        if (animationRef.current) {
+            isPlaying ? animationRef.current.play() : animationRef.current.pause();
         }
-    }, [isPlaying]); // Only re-run if isPlaying changes
+    }, [isPlaying]);
 
-    return (
-        <div ref={lottieContainerRef} style={{ width: '100%', height: '100%' }}></div>
-    );
+    return <div ref={lottieContainerRef} style={{ width: '100%', height: '100%' }} />;
 };
 
 export default LottiePlayer;

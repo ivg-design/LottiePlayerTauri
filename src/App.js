@@ -326,9 +326,9 @@ const App = () => {
 			</div>
 			<div className="mainArea">
 				<div className="appName">
-				<h1>Your App Title</h1>
+				{/* <h1>Your App Title</h1> */}
 				</div>
-				{animationData && <PlayerUI animationData={animationData} version="5-12-2"/>}
+				{<PlayerUI animationData={animationData} version="5-12-2"/>}
 			</div>
 		</div>
 	);
