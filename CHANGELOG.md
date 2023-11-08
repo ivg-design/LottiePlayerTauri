@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.3...v1.3.4) (2023-11-08)
+
+
+### Bug Fixes
+
+* added embedded font - Inter ([b5888ab](https://github.com/ivg-design/LottiePlayerTauri/commit/b5888abea1990ac64255c6f58c76fb4a2c878d8d))
+
 ## [1.3.3](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.2...v1.3.3) (2023-11-08)
 
 
