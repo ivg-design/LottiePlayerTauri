@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.2.1...v1.2.2) (2023-11-08)
+
+
+### Bug Fixes
+
+* add sidebar scroll logic ([bdae018](https://github.com/ivg-design/LottiePlayerTauri/commit/bdae018925994fce3246bc98a215f2595c8c6d30))
+
 ## [1.2.1](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.2.0...v1.2.1) (2023-11-08)
 
 
