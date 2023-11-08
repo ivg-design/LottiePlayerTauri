@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.4...v1.3.5) (2023-11-08)
+
+
+### Bug Fixes
+
+* progress bar and play pause buttons work ([9b0c9ea](https://github.com/ivg-design/LottiePlayerTauri/commit/9b0c9eafcfb07f93c511501ff8ae55e2e3417b9a))
+
 ## [1.3.4](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.3...v1.3.4) (2023-11-08)
 
 
