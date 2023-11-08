@@ -1,5 +1,7 @@
 module.exports = {
-    branches: ['main'],  // Replace with your default branch if not 'main'
+    branches: [
+        { name: 'main', prerelease: 'alpha' },  // Add the prerelease property here
+    ],
     plugins: [
         '@semantic-release/commit-analyzer',
         '@semantic-release/release-notes-generator',
@@ -8,7 +10,7 @@ module.exports = {
         [
             '@semantic-release/git',
             {
-                assets: ['CHANGELOG.md', 'package.json', 'package-lock.json'], // Update to match the files you want to commit
+                assets: ['CHANGELOG.md', 'package.json', 'package-lock.json'],
                 message: 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
             },
         ],
