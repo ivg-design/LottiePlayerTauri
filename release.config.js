@@ -4,7 +4,7 @@ module.exports = {
             channel: undefined,
             type: 'prerelease',
             name: 'alpha',
-            prerelease: 'alpha'
+            prerelease: 'alpha',
         },  // Add the prerelease property here
     ],
     plugins: [
