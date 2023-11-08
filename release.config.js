@@ -1,7 +1,6 @@
 module.exports = {
     branches: [
         {
-            channel: undefined,
             type: 'prerelease',
             name: 'alpha',
             prerelease: 'alpha',
