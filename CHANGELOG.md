@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.2.2...v1.3.0) (2023-11-08)
+
+
+### Features
+
+* add pre-release notation ([b558ffa](https://github.com/ivg-design/LottiePlayerTauri/commit/b558ffaa83595556d09063ebe86fcd47649c9397))
+
 ## [1.2.2](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.2.1...v1.2.2) (2023-11-08)
 
 
