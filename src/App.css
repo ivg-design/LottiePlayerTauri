@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Inter';
+  src: local('Inter'), url('./fonts/Inter-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+
 .App {
   background-color: #282828;
   color: white;
