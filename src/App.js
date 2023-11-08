@@ -264,23 +264,6 @@ const App = () => {
 			console.error('Error reading the Lottie file:', error);
 		}
 	};
-
-	// Example of setting the animation data (you might fetch this data or import it)
-	useEffect(() => {
-		// This is where you would fetch or import your animation data
-		// For this example, let's assume you have a local file called 'animation.json'
-		const fetchAnimationData = async () => {
-			try {
-				const response = await fetch('/path/to/your/animation.json');
-				const data = await response.json();
-				setAnimationData(data);
-			} catch (error) {
-				console.error('Error fetching animation data:', error);
-			}
-		};
-
-		fetchAnimationData();
-	}, []);
 	
 	return (
 		<div className="App">

@@ -1,54 +1,56 @@
+// playPauseBtn.js
 import React, { useEffect, useRef, useState } from 'react';
 import lottie from 'lottie-web';
 
-const PlayPauseButton = ({ size = 100, animationPath, onToggle }) => {
-    const [isPlaying, setIsPlaying] = useState(true); // Start in play state
+const PlayPauseBtn = ({ size = 100, onToggle }) => {
+    const [isPlaying, setIsPlaying] = useState(true); // true for play, false for pause
     const animationContainer = useRef(null);
-    const anim = useRef(null);
+    const animationInstance = useRef(null);
 
     useEffect(() => {
-        // Load the animation by path
-        anim.current = lottie.loadAnimation({
+        // Load the animation
+        animationInstance.current = lottie.loadAnimation({
             container: animationContainer.current,
             renderer: 'svg',
             loop: false,
             autoplay: false,
-            path: animationPath
+            path: 'lottieUIElements/playPauseBtn.json' // Path is relative to the public folder
         });
 
-        // Go to the last frame (assuming the last frame is the "play" state)
-        anim.current.goToAndStop(anim.current.totalFrames - 1, true);
-
-        // Add an event listener to handle the end of the animation
-        anim.current.addEventListener('complete', () => {
-            if (onToggle) {
-                onToggle(isPlaying);
+        // Event listener for when the animation completes a segment
+        animationInstance.current.addEventListener('complete', () => {
+            if (!isPlaying) {
+                animationInstance.current.pause();
             }
         });
 
-        // Clean up
+        // Cleanup function
         return () => {
-            anim.current.destroy();
+            if (animationInstance.current) {
+                animationInstance.current.destroy();
+            }
         };
-    }, [animationPath, onToggle]);
+    }, []);
+
+    useEffect(() => {
+        // Play the animation for the current state
+        const direction = isPlaying ? -1 : 1; // Play in reverse if it is playing
+        animationInstance.current.setDirection(direction);
+        animationInstance.current.play();
+    }, [isPlaying]);
 
     const togglePlayPause = () => {
         setIsPlaying(!isPlaying);
-        if (isPlaying) {
-            anim.current.setDirection(-1); // Play in reverse if we are pausing
-        } else {
-            anim.current.setDirection(1); // Play forward if we are playing
-        }
-        anim.current.play();
+        onToggle(!isPlaying);
     };
 
     return (
         <div
             ref={animationContainer}
-            onClick={togglePlayPause}
             style={{ width: size, height: size, cursor: 'pointer' }}
-        />
+            onClick={togglePlayPause}
+        ></div>
     );
 };
 
-export default PlayPauseButton;
+export default PlayPauseBtn;
