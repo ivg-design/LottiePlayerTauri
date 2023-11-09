@@ -1,5 +1,26 @@
 /* PlayerUI.css */
+
+.noSelect {
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* IE10+/Edge */
+    user-select: none;
+    /* Standard */
+}
+.hidden {
+    display: none;
+}
+
+.icon-large {
+    transform: scale(2);
+    /* Adjust size as needed */
+    /* or use transform: scale(1.5); */
+}
 .playbackContainer {
+    position:relative;
     margin-top: 20px;
     margin-left: 10px;
     /* margin-bottom: 20px; */
@@ -14,6 +35,69 @@
     transition: all 300ms ease-in-out;
     color: #FFF;
 }
+.colorPickerModal {
+    position: fixed;
+    /* Fixed position */
+    top: 50%;
+    /* Center vertically */
+    left: 50%;
+    /* Center horizontally */
+    transform: translate(-50%, -50%);
+    /* Adjust for centering */
+    z-index: 100;
+
+    background: #FFF;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 10px 10px 40px 0px #000000;   
+    cursor: pointer;
+}
+.closeColorPicker{
+    margin-top:10px;
+    width:100%;
+    background: orange;
+    font-style: bold;
+    font-weight: 600;
+    color: #333333;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.applyColorPicker{
+    margin-top:10px;
+    width:100%;
+    background:green;
+    font-style: bold;
+    font-weight: 600;
+    color: #ffffff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.infoOverlay{
+    position: absolute;
+    display: grid;
+        grid-template-columns: auto auto;
+        /* Creates two columns: one for labels, one for values */
+        gap: 10px;
+        /* Space between rows and columns */
+    /* Space between items */
+    top: 10px;
+    /* Adjust as needed */
+    right: 10px;
+    /* Adjust as needed */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent black */
+    color: white;
+    /* Text color */
+    padding: 15px;
+    border-radius: 5px;
+    z-index: 10;
+    /* Ensure it's above other elements */
+    width: 300px;
+    /* Adjust based on your preference */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Optional: for better visibility */
+    font-size: 0.9em;
+    /* Adjust as needed */}
 
 .lottie-container {
     width: 100%;
@@ -47,6 +131,7 @@
     height: 8px;
     top: 50%;
     bottom: 50%;
+    box-shadow: 3px 3px 6px 0px #14151D, -3px -3px 6px 0px #303240;
 }
 
 .progress-bar-handle {
@@ -66,6 +151,30 @@
 .progress-bar-handle:active {
     cursor: grabbing;
 }
+
+.colorPickerButton{
+    margin-top: 20px;
+    margin-left: 30px;
+    margin-bottom: 20px;
+    margin-right: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #B97208 0%, #FFD800 100%);
+    box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;;
+}
+.infoButton {
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-bottom: 20px;
+    margin-right: 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #B97208 0%, #FFD800 100%);
+    box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
+    ;
+}
 .playBtn {
     margin-top: 20px;
     margin-left: 30px;
@@ -75,7 +184,7 @@
     height: 30px;
     flex-shrink: 0;
     border-radius: 5px;
-    border: 0px solid rgba(32, 34, 44, 0.30);
+    /* border: 0px solid rgba(32, 34, 44, 0.30); */
     background: linear-gradient(180deg, #B97208 0%, #FFD800 100%);
     box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
     transition: all 300ms ease-in-out;
@@ -98,7 +207,7 @@
     height: 30px;
     flex-shrink: 0;
     border-radius: 5px;
-    border: 0px solid rgba(32, 34, 44, 0.30);
+    /* border: 0px solid rgba(32, 34, 44, 0.30); */
     background: linear-gradient(180deg, #B97208 0%, #FFD800 100%);
     box-shadow: 4px 4px 10px 0px #14151D, -3px -3px 10px 0px #303240;
     transition: all 300ms ease-in-out;
@@ -121,7 +230,7 @@
     height: 30px;
     flex-shrink: 0;
     border-radius: 5px;
-    border: 1px solid #1eba06;
+    /* border: 1px solid #1eba06; */
     background: linear-gradient(180deg, #068635 0%, #02471d 100%);;
     box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
     color: #FFF;
@@ -142,7 +251,7 @@
     height: 30px;
     flex-shrink: 0;
     border-radius: 5px;
-    border: 1px solid #1eba06;
+    /* border: 1px solid #1eba06; */
     background: linear-gradient(180deg, #068635 0%, #02471d 100%);
     ;
     box-shadow: 4px 4px 10px 0px #14151D, -3px -3px 10px 0px #303240;

@@ -2,23 +2,39 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import LottiePlayer from './LottiePlayer';
 import './PlayerUI.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faPalette, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { ReactComponent as ProgressBar } from './svgUIelements/progressBar.svg';
 import { ReactComponent as ProgressBarHandle } from './svgUIelements/progressBarHandle.svg';
-import {enableDebugging, disableDebugging, debugLog} from './debugger.js';
+import { enableDebugging, debugLog } from './debugger.js';
+import ColorPicker from 'react-best-gradient-color-picker';
+import LottieInfoParser from './LottieInfoParser';
+
 
 // enable imported debug logger
 enableDebugging();
 
-const PlayerUI = ({ animationData, version, }) => {
+const PlayerUI = ({ animationData, version }) => {
+    const animationRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(true);
     const [progress, setProgress] = useState(0);
-    const animationRef = useRef(null);
     const progressBarRef = useRef(null);
+    const [isPickerVisible, setIsPickerVisible] = useState(false);
+    const [background, setBackground] = useState('linear-gradient(180deg, #3B3D4B 0%, #272934 100%)');
+    const [initialColor, setInitialColor] = useState(background); // Store initial color before opening picker
+    const [showInfoOverlay, setShowInfoOverlay] = useState(false);
+
+    // Function to toggle the visibility of the info overlay
+    const toggleInfoOverlay = () => {
+        setShowInfoOverlay(!showInfoOverlay);
+    };
+
+    // Prevent default behavior on mouse down to stop text selection cursor
+    const handleMouseDownPreventDefault = (event) => {
+        event.preventDefault();
+    };
 
     // Play or pause the animation based on isPlaying state
     useEffect(() => {
-        // This will run when the `isPlaying` state changes.
         if (animationRef.current) {
             debugLog('Toggling play state to:', isPlaying);
             if (isPlaying) {
@@ -31,13 +47,14 @@ const PlayerUI = ({ animationData, version, }) => {
         }
     }, [isPlaying]);
 
-    // Function to update progress when animation updates
+    // Update progress when animation updates
     const handleAnimationUpdate = useCallback((animationProgress) => {
         setProgress(animationProgress);
     }, []);
+
     // Toggle play state
     const togglePlay = () => {
-        debugLog('Toggling play. Current state is: ', isPlaying);;
+        debugLog('Toggling play. Current state is: ', isPlaying);
         setIsPlaying(!isPlaying);
     };
 
@@ -48,9 +65,8 @@ const PlayerUI = ({ animationData, version, }) => {
             const frame = Math.floor(animationRef.current.totalFrames * progress);
             debugLog(`Going to frame ${frame}`);
             animationRef.current.goToAndStop(frame, true);
-            debugLog("frame is ", frame)
         }
-    }, [progress]);
+    }, [progress, isPlaying]);
 
     // Update progress from mouse events
     const setProgressFromEvent = useCallback((e) => {
@@ -83,12 +99,51 @@ const PlayerUI = ({ animationData, version, }) => {
         document.addEventListener('mouseup', handleMouseUp);
     }, [setProgressFromEvent, handleMouseMove, handleMouseUp]);
 
+    // Open the color picker and store the current color
+    const toggleColorPicker = (e) => {
+        e.stopPropagation();
+        if (!isPickerVisible) {
+            setInitialColor(background); // Store the current color before opening the picker
+        }
+        setIsPickerVisible(!isPickerVisible);
+    };
 
+    // Close the color picker and revert to the initial color
+    const closeAndRevertColorPicker = () => {
+        setBackground(initialColor); // Revert to the color before the picker was opened
+        setIsPickerVisible(false);
+    };
+    // Handle color changes
+    const handleColorChange = (newColor) => {
+        setBackground(newColor);
+    };
 
+    // Close the color picker
+    const closeColorPicker = () => {
+        setIsPickerVisible(false);
+    };
 
+    // Stop propagation when clicking inside the modal
+    const handleModalClick = (e) => {
+        e.stopPropagation();
+    };
+
+    const handleApplyColorPicker = () => {
+        setBackground(background);
+        setIsPickerVisible(false);
+    }
+
+    useEffect(() => {
+        document.addEventListener('click', closeColorPicker);
+        return () => {
+            document.removeEventListener('click', closeColorPicker);
+        };
+    }, []);
 
     return (
-        <div className="playbackContainer">
+        <div className="playbackContainer" style={{ background: background }}
+            onMouseDown={handleMouseDownPreventDefault}>
+            
             <LottiePlayer
                 animationData={animationData}
                 version={version}
@@ -97,24 +152,51 @@ const PlayerUI = ({ animationData, version, }) => {
                 animationRef={animationRef}
                 onEnterFrame={handleAnimationUpdate}
             />
-            <div className="player-controls">
+            <div className={`infoOverlay noSelect ${showInfoOverlay ? '' : 'hidden'}`}>
+                {showInfoOverlay && (
+                    <LottieInfoParser animationData={animationData} />        
+                )}
+            </div>
+            <div className="player-controls noSelect">
                 <button
-                    className={isPlaying ? 'playBtn' : 'pauseBtn'}
+                    className={isPlaying ? 'playBtn noSelect' : 'pauseBtn noSelect'}
                     onClick={togglePlay}
                 >
                     <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} />
                     {isPlaying ? ' Pause' : ' Play'}
                 </button>
                 <div
-                    className="progress-bar-container"
+                    className="progress-bar-container noSelect"
                     ref={progressBarRef}
                     onMouseDown={handleMouseDown}
                 >
-                    <ProgressBar className="progress-bar-svg" />
+                    <ProgressBar className="progress-bar-svg noSelect" />
                     <ProgressBarHandle
-                        className="progress-bar-handle"
+                        className="progress-bar-handle noSelect"
                         style={{ left: `${progress * 100}%` }}
                     />
+                </div>
+                <div className="colorPickerContainer">
+                    <button onClick={toggleColorPicker} className="colorPickerButton noSelect">
+                        <FontAwesomeIcon icon={faPalette} className="icon-large" />
+                    </button>
+                    <button onClick={toggleInfoOverlay} className="infoButton noSelect">
+                        <FontAwesomeIcon icon={faInfoCircle} className = "icon-large" />
+                    </button>
+                    {isPickerVisible && (
+                        <div className="colorPickerModal noSelect" onClick={handleModalClick} style={{ backgroundColor: 'white' }}>
+                            <ColorPicker
+                                value={background}
+                                onChange={handleColorChange}
+                            />
+                            <button onClick={handleApplyColorPicker} className="applyColorPicker noSelect">
+                                Apply
+                            </button>
+                            <button onClick={closeAndRevertColorPicker} className="closeColorPicker noSelect">
+                                Cancel
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
