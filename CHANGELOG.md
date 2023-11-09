@@ -1,3 +1,10 @@
+## [1.3.7](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.6...v1.3.7) (2023-11-09)
+
+
+### Bug Fixes
+
+* update on infooverlay ([6d8d6be](https://github.com/ivg-design/LottiePlayerTauri/commit/6d8d6beb2f568cb837abb3d2eb5616b9bd63add1))
+
 ## [1.3.6](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.5...v1.3.6) (2023-11-09)
 
 
