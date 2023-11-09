@@ -1,4 +1,3 @@
-// debugger.js
 let isDebuggingEnabled = false;
 
 export const enableDebugging = () => {
@@ -11,6 +10,6 @@ export const disableDebugging = () => {
 
 export const debugLog = (...args) => {
     if (isDebuggingEnabled) {
-        console.log(...args);
+        console.trace(...args);
     }
 };

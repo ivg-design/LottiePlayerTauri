@@ -5,23 +5,48 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faPalette, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { ReactComponent as ProgressBar } from './svgUIelements/progressBar.svg';
 import { ReactComponent as ProgressBarHandle } from './svgUIelements/progressBarHandle.svg';
-import { enableDebugging, debugLog } from './debugger.js';
 import ColorPicker from 'react-best-gradient-color-picker';
 import LottieInfoParser from './LottieInfoParser';
+const isLoggingEnabled = true;  // Set to false to disable logging
+
+//ERROR LOGGING
+function log(...messages) {
+    if (isLoggingEnabled) {
+        console.log(...messages);
+    }
+}
 
 
-// enable imported debug logger
-enableDebugging();
-
-const PlayerUI = ({ animationData, version }) => {
+const PlayerUI = ({ animationData, version, fileSize }) => {
     const animationRef = useRef(null);
-    const [isPlaying, setIsPlaying] = useState(true);
+    const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
     const progressBarRef = useRef(null);
     const [isPickerVisible, setIsPickerVisible] = useState(false);
     const [background, setBackground] = useState('linear-gradient(180deg, #3B3D4B 0%, #272934 100%)');
     const [initialColor, setInitialColor] = useState(background); // Store initial color before opening picker
     const [showInfoOverlay, setShowInfoOverlay] = useState(false);
+    const [currentFrame, setCurrentFrame] = useState(0);
+    const [currentTime, setCurrentTime] = useState(0);
+
+    log(fileSize);// State to store animation details;
+    
+    const [animationDetails, setAnimationDetails] = useState({
+        framerate: 0,
+        durationFrames: 0,
+        durationSeconds: 0,
+        // ... any additional details ...
+    });
+
+    // Callback function to be called by LottieInfoParser
+    const handleAnimationDataParsed = useCallback((details) => {
+        setAnimationDetails(details);
+    }, []);
+
+    // Calculate current progress based on animation details
+    const currentProgressFrames = Math.round(animationDetails.framerate * progress);
+    const currentProgressSeconds = (currentProgressFrames / animationDetails.framerate).toFixed(2);
+
 
     // Function to toggle the visibility of the info overlay
     const toggleInfoOverlay = () => {
@@ -36,12 +61,9 @@ const PlayerUI = ({ animationData, version }) => {
     // Play or pause the animation based on isPlaying state
     useEffect(() => {
         if (animationRef.current) {
-            debugLog('Toggling play state to:', isPlaying);
             if (isPlaying) {
-                debugLog('Playing animation');
                 animationRef.current.play();
             } else {
-                debugLog('Pausing animation');
                 animationRef.current.pause();
             }
         }
@@ -54,16 +76,13 @@ const PlayerUI = ({ animationData, version }) => {
 
     // Toggle play state
     const togglePlay = () => {
-        debugLog('Toggling play. Current state is: ', isPlaying);
         setIsPlaying(!isPlaying);
     };
 
     // Update the animation frame based on progress
     useEffect(() => {
-        debugLog('useEffect for progress', progress);
         if (animationRef.current && !isPlaying) {
             const frame = Math.floor(animationRef.current.totalFrames * progress);
-            debugLog(`Going to frame ${frame}`);
             animationRef.current.goToAndStop(frame, true);
         }
     }, [progress, isPlaying]);
@@ -75,18 +94,15 @@ const PlayerUI = ({ animationData, version }) => {
             const newProgress = (e.clientX - bounds.left) / bounds.width;
             setProgress(Math.min(Math.max(0, newProgress), 1));
         } else {
-            debugLog('progressBarRef.current is null during setProgressFromEvent');
         }
     }, []);
 
     // Mouse event handlers
     const handleMouseMove = useCallback((e) => {
-        debugLog('Handling mouse move');
         setProgressFromEvent(e);
     }, [setProgressFromEvent]);
 
     const handleMouseUp = useCallback(() => {
-        debugLog('Mouse up, removing event listeners');
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
     }, [handleMouseMove]);
@@ -140,6 +156,16 @@ const PlayerUI = ({ animationData, version }) => {
         };
     }, []);
 
+    // Function to calculate current frame and time based on progress
+    useEffect(() => {
+        if (animationDetails.framerate > 0) {
+            const frame = Math.round(animationDetails.durationFrames * progress);
+            const time = frame / animationDetails.framerate;
+            setCurrentFrame(frame);
+            setCurrentTime(time.toFixed(2));
+        }
+    }, [progress, animationDetails]);
+
     return (
         <div className="playbackContainer" style={{ background: background }}
             onMouseDown={handleMouseDownPreventDefault}>
@@ -154,8 +180,14 @@ const PlayerUI = ({ animationData, version }) => {
             />
             <div className={`infoOverlay noSelect ${showInfoOverlay ? '' : 'hidden'}`}>
                 {showInfoOverlay && (
-                    <LottieInfoParser animationData={animationData} />        
+                    <LottieInfoParser animationData={animationData} fileSize={fileSize} onParsed={handleAnimationDataParsed} />        
                 )}
+            </div>
+            <div className={`progressInfoBox noSelect ${showInfoOverlay ? '' : 'hidden'}`}>
+                <div>Current Time: </div>
+                <div>{currentTime} s</div>
+                <div>Current Frame: </div>
+                <div>{currentFrame}</div>
             </div>
             <div className="player-controls noSelect">
                 <button

@@ -32,7 +32,6 @@ const LottiePlayer = ({ animationData, version, isPlaying, animationRef, onEnter
 
         // Cleanup function
         return () => {
-            console.log("####### destroy");
             document.body.removeChild(script);
             if (animationRef.current) {
                 animationRef.current.removeEventListener('enterFrame');

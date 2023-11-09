@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { open } from '@tauri-apps/api/dialog';
-import { readTextFile } from '@tauri-apps/api/fs';
+import { readTextFile, readBinaryFile } from '@tauri-apps/api/fs';
 import PlayerUI from './PlayerUI.js'; // Import the PlayerUI component
-
 import 'font-awesome/css/font-awesome.min.css';
 import './NeumorphicButton.css';
 import './App.css';
@@ -179,6 +178,8 @@ const App = () => {
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [progress, setProgress] = useState(0);
 	const lottieRef = useRef(null);
+	const [fileSize, setFileSize] = useState(null);
+
 
 	useEffect(() => {
 		const fetchDir = async () => {
@@ -232,11 +233,16 @@ const App = () => {
 		try {
 			const result = await open({
 				multiple: false,
-				directory: false, // make sure it's set to false to open files
+				directory: false, // Ensure it's set to false to open files
 			});
 			if (typeof result === 'string') {
 				const animationJson = await readTextFile(result);
 				setAnimationData(JSON.parse(animationJson));
+
+				// Get the file size for the selected file
+				const binaryData = await readBinaryFile(result);
+				const sizeInKb = binaryData.length / 1024;
+				setFileSize(sizeInKb); // Update state with the file size
 
 				// Get path segments and update tree navigation
 				const pathSegments = result.split('/');
@@ -283,11 +289,14 @@ const App = () => {
 			if (filePath.endsWith('.json')) {
 				const animationJson = await readTextFile(filePath);
 				setAnimationData(JSON.parse(animationJson));
+
+				// Additionally, get the file size using Tauri's File System API
+				const binaryData = await readBinaryFile(filePath);
+				const sizeInKb = binaryData.length / 1024;
+				setFileSize(sizeInKb); // Update state with the file size
 			} else {
-				console.log('Selected item is not a Lottie JSON file.');
 			}
 		} catch (error) {
-			console.error('Error reading the Lottie file:', error);
 		}
 	};
 	
@@ -328,7 +337,11 @@ const App = () => {
 				<div className="appName">
 				{/* <h1>Your App Title</h1> */}
 				</div>
-				{<PlayerUI animationData={animationData} version="5-12-2"/>}
+				{<PlayerUI
+					animationData={animationData}
+					version="5-12-2"
+					fileSize={fileSize}
+				/>}
 			</div>
 		</div>
 	);
