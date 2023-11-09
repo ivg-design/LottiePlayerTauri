@@ -1,3 +1,10 @@
+## [1.3.6](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.5...v1.3.6) (2023-11-09)
+
+
+### Bug Fixes
+
+* added color picker with gradients ([a3c6ac3](https://github.com/ivg-design/LottiePlayerTauri/commit/a3c6ac34c3933f951857814521bc699be8c3e234))
+
 ## [1.3.5](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.4...v1.3.5) (2023-11-08)
 
 
