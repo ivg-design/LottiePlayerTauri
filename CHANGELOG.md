@@ -1,3 +1,10 @@
+## [1.3.12](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.11...v1.3.12) (2023-11-10)
+
+
+### Bug Fixes
+
+* sidebar handle extended ([e68d4f3](https://github.com/ivg-design/LottiePlayerTauri/commit/e68d4f36d7ec6920dad8262fdff037bd03f7440c))
+
 ## [1.3.11](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.10...v1.3.11) (2023-11-10)
 
 
