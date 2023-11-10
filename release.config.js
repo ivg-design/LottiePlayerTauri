@@ -45,8 +45,8 @@ module.exports = {
                     }
 
                     return null;
-                },
-            },
+                }, 
+            }, 
         }],
         '@semantic-release/changelog',
         ['@semantic-release/git', {
