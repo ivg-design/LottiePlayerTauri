@@ -1,7 +1,7 @@
 # Lottie Player Application (WIP)
 
 ## Overview
-The Lottie Player Application is a dynamic Tauri-based platform currently under development. It is designed for animators and developers who wish to interact with Lottie animations. The application enables users to select, view, and control Lottie animations embedded in `.json` or `.html` files, and will be available as a compiled multi-platform application.
+The Lottie Player Application is a dynamic Tauri-based platform currently under development. It is designed for animators and developers who wish to interact with Lottie animations. The application enables users to select, view, and control Lottie animations embedded in `.json` or `.html` files, and will be available as a compiled multi-platform application .
 
 ## Features
 - **File Selection:** Choose individual or multiple files or folders containing Lottie animations.
