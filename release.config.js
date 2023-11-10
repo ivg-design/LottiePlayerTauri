@@ -26,7 +26,25 @@ module.exports = {
             preset: 'angular',
             writerOpts: {
                 transform: (commit, context) => {
-                    // Custom logic for changelog entries
+                    const isRelevantChange = (line) => line.startsWith('fix:') || line.startsWith('feat:');
+
+                    if (commit && commit.message) {
+                        const lines = commit.message.split('\n');
+                        const relevantLines = lines.filter(isRelevantChange);
+
+                        return relevantLines.map(line => {
+                            const [type, ...messageParts] = line.split(':');
+                            const message = messageParts.join(':').trim();
+
+                            return {
+                                ...commit,
+                                type,
+                                subject: message
+                            };
+                        });
+                    }
+
+                    return null;
                 },
             },
         }],
