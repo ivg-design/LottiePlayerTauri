@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import LottiePlayer from './LottiePlayer';
 import './PlayerUI.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faPalette, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faPalette, faInfoCircle, faDiagramPredecessor, faCodeCompare } from '@fortawesome/free-solid-svg-icons';
 import { ReactComponent as ProgressBar } from './svgUIelements/progressBar.svg';
 import { ReactComponent as ProgressBarHandle } from './svgUIelements/progressBarHandle.svg';
 import ColorPicker from 'react-best-gradient-color-picker';
@@ -169,7 +169,7 @@ const PlayerUI = ({ animationData, version, fileSize }) => {
     return (
         <div className="playbackContainer" style={{ background: background }}
             onMouseDown={handleMouseDownPreventDefault}>
-            
+
             <LottiePlayer
                 animationData={animationData}
                 version={version}
@@ -180,7 +180,7 @@ const PlayerUI = ({ animationData, version, fileSize }) => {
             />
             <div className={`infoOverlay noSelect ${showInfoOverlay ? '' : 'hidden'}`}>
                 {showInfoOverlay && (
-                    <LottieInfoParser animationData={animationData} fileSize={fileSize} onParsed={handleAnimationDataParsed} />        
+                    <LottieInfoParser animationData={animationData} fileSize={fileSize} onParsed={handleAnimationDataParsed} />
                 )}
             </div>
             <div className={`progressInfoBox noSelect ${showInfoOverlay ? '' : 'hidden'}`}>
@@ -208,31 +208,41 @@ const PlayerUI = ({ animationData, version, fileSize }) => {
                         style={{ left: `${progress * 100}%` }}
                     />
                 </div>
-                <div className="colorPickerContainer">
-                    <button onClick={toggleColorPicker} className="colorPickerButton noSelect">
-                        <FontAwesomeIcon icon={faPalette} className="icon-large" />
-                    </button>
-                    <button onClick={toggleInfoOverlay} className="infoButton noSelect">
-                        <FontAwesomeIcon icon={faInfoCircle} className = "icon-large" />
-                    </button>
-                    {isPickerVisible && (
-                        <div className="colorPickerModal noSelect" onClick={handleModalClick} style={{ backgroundColor: 'white' }}>
-                            <ColorPicker
-                                value={background}
-                                onChange={handleColorChange}
-                            />
-                            <button onClick={handleApplyColorPicker} className="applyColorPicker noSelect">
-                                Apply
-                            </button>
-                            <button onClick={closeAndRevertColorPicker} className="closeColorPicker noSelect">
-                                Cancel
-                            </button>
-                        </div>
-                    )}
-                </div>
+                <button onClick={toggleColorPicker} className="colorPickerButton noSelect">
+                    <FontAwesomeIcon icon={faPalette} className="icon-large" />
+                </button>
+                <button onClick={toggleInfoOverlay} className="infoButton noSelect">
+                    <FontAwesomeIcon icon={faInfoCircle} className="icon-large" />
+                </button>
+
+                {/* New Diagram Predecessor button */}
+                <button className="markersButton noSelect">
+                    <FontAwesomeIcon icon={faDiagramPredecessor} className="icon-large" />
+                </button>
+
+                {/* New Code Compare button */}
+                <button className="segmentsButton noSelect">
+                    <FontAwesomeIcon icon={faCodeCompare} className="icon-large" />
+                </button>
+
+                {isPickerVisible && (
+                    <div className="colorPickerModal noSelect" onClick={handleModalClick} style={{ backgroundColor: 'white' }}>
+                        <ColorPicker
+                            value={background}
+                            onChange={handleColorChange}
+                        />
+                        <button onClick={handleApplyColorPicker} className="applyColorPicker noSelect">
+                            Apply
+                        </button>
+                        <button onClick={closeAndRevertColorPicker} className="closeColorPicker noSelect">
+                            Cancel
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
+
 };
 
 export default PlayerUI;

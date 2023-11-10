@@ -4,6 +4,8 @@ import { open } from '@tauri-apps/api/dialog';
 import { readTextFile, readBinaryFile } from '@tauri-apps/api/fs';
 import PlayerUI from './PlayerUI.js'; // Import the PlayerUI component
 import 'font-awesome/css/font-awesome.min.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFolderTree, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import './NeumorphicButton.css';
 import './App.css';
 
@@ -167,7 +169,7 @@ const TreeNode = React.forwardRef(({
 // App component
 const App = () => {
 	const [folderStructure, setFolderStructure] = useState([]);
-	const [sidebarWidth, setSidebarWidth] = useState(440);
+	const [sidebarWidth, setSidebarWidth] = useState(200);
 	const [collapsed, setCollapsed] = useState(true);
 	const [isResizing, setIsResizing] = useState(false);
 	const [selectedPath, setSelectedPath] = useState(null);
@@ -311,10 +313,10 @@ const App = () => {
 						}}
 						className={`button ${isTreeToggled ? "button-toggled" : ""}`} // Apply the toggled class based on the state
 					>
-						Toggle Tree
+						<FontAwesomeIcon icon={faFolderTree} className="icon-large" />
 					</button>
 					<button onClick={handleChooseFile} className="button">
-						Choose File/Folder
+						<FontAwesomeIcon icon={faFileImport} className = "icon-large"/>
 					</button>
 				</div>
 				{!collapsed &&
