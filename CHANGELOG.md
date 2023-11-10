@@ -1,3 +1,10 @@
+## [1.3.8](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.7...v1.3.8) (2023-11-10)
+
+
+### Bug Fixes
+
+* add markers and segements buttons ([a9b3c90](https://github.com/ivg-design/LottiePlayerTauri/commit/a9b3c908f001c22ea0df9d92f11aed34363c26e1))
+
 ## [1.3.7](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.6...v1.3.7) (2023-11-09)
 
 
