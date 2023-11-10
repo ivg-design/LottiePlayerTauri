@@ -1,3 +1,10 @@
+## [1.3.9](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.8...v1.3.9) (2023-11-10)
+
+
+### Performance Improvements
+
+* checking multiline commenting for commit /n ([e9725c8](https://github.com/ivg-design/LottiePlayerTauri/commit/e9725c860d241191c6a1159c96a0ab0419e92909))
+
 ## [1.3.8](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.7...v1.3.8) (2023-11-10)
 
 
