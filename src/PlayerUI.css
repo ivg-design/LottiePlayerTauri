@@ -1,5 +1,6 @@
 /* PlayerUI.css */
 
+/** general modifiers */
 .noSelect {
     -webkit-user-select: none;
     /* Safari */
@@ -13,12 +14,13 @@
 .hidden {
     display: none !important;
 }
-
 .icon-large {
     transform: scale(2.5);
     /* Adjust size as needed */
     /* or use transform: scale(1.5); */
 }
+/*******************************************/
+
 .playbackContainer {
     position:relative;
     margin-top: 20px;
@@ -296,4 +298,63 @@
     line-height: normal;
     transition: all 300ms ease-in-out;
 
+}
+.modalBackdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 5px; 
+    background: rgba(0, 0, 0, 00);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.markersModal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color:#000000;
+    cursor: pointer;
+}
+
+.markersTable {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+}
+
+.markersTable th,
+.markersTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.markersTable {
+    background-color: #f2f2f2;
+}
+
+.markersTable tr:hover {
+    background-color: #ddd;
+}
+
+.markersTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #4CAF50;
+    color: white;
+}
+.resetButton{
+    margin-top: 10px;
+    width: 120px;
+    height: 20px;
+    justify-content: center;
 }

@@ -8,7 +8,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderTree, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import './NeumorphicButton.css';
 import './App.css';
-
+const isLoggingEnabled = true; // Set to false to disable logging
+// ERROR LOGGING
+function log(...messages) {
+	if (isLoggingEnabled) {
+		console.log(...messages);
+	}
+}
 // Helper function to sort items
 const sortItems = (items) => {
 	return items.sort((a, b) => {
@@ -181,7 +187,20 @@ const App = () => {
 	const [progress, setProgress] = useState(0);
 	const lottieRef = useRef(null);
 	const [fileSize, setFileSize] = useState(null);
+	const resizeHandleRef = useRef(null);
+	const treeNodesContainerRef = useRef(null);
 
+	useEffect(() => {
+		if (treeNodesContainerRef.current) {
+			const treeNodes = Array.from(treeNodesContainerRef.current.getElementsByClassName('treeChildren'));
+			const tallestNodeHeight = Math.max(...treeNodes.map(node => node.offsetHeight));
+
+			if (resizeHandleRef.current) {
+				resizeHandleRef.current.style.height = `${tallestNodeHeight}px`;
+			}
+		}
+
+	}, []); // Add dependencies if needed
 
 	useEffect(() => {
 		const fetchDir = async () => {
@@ -304,7 +323,7 @@ const App = () => {
 	
 	return (
 		<div className="App">
-			<div className="sidebar" style={{ width: `${sidebarWidth}px` }}>
+			<div className="sidebar" ref={treeNodesContainerRef} style={{ width: `${sidebarWidth}px` }}>
 				<div className="sidebar-header">
 					<button
 						onClick={() => {
@@ -333,7 +352,7 @@ const App = () => {
 							onFileSelected={handleFileSelected} // Pass the new function as a prop to TreeNode
 						/>
 					))}
-				<div className="resize-handle" onMouseDown={startResizing} />
+				<div className="resize-handle" ref={resizeHandleRef} onMouseDown={startResizing} />
 			</div>
 			<div className="mainArea">
 				<div className="appName">
