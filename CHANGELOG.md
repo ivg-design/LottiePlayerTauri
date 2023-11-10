@@ -1,3 +1,10 @@
+## [1.3.14](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.13...v1.3.14) (2023-11-10)
+
+
+### Bug Fixes
+
+* trying a custom ([1fd96fc](https://github.com/ivg-design/LottiePlayerTauri/commit/1fd96fca0d4533a283a646a7dbfd24ad14f33e21))
+
 ## [1.3.13](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.12...v1.3.13) (2023-11-10)
 
 
