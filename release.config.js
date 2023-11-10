@@ -40,5 +40,5 @@ module.exports = {
         }],
         // Add more plugins as necessary
     ],
-    ci: false, // Set to true if you are using CI
+    ci: false, //  Set to true if you are using CI
 };
