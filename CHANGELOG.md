@@ -1,3 +1,10 @@
+## [1.3.11](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.10...v1.3.11) (2023-11-10)
+
+
+### Bug Fixes
+
+* multiline \n ([026794c](https://github.com/ivg-design/LottiePlayerTauri/commit/026794c73a24f8d5ad11e121d0fa3dc46cf340f8))
+
 ## [1.3.10](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.9...v1.3.10) (2023-11-10)
 
 
