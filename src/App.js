@@ -6,7 +6,6 @@ import PlayerUI from './PlayerUI.js'; // Import the PlayerUI component
 import 'font-awesome/css/font-awesome.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderTree, faFileImport } from '@fortawesome/free-solid-svg-icons';
-import './NeumorphicButton.css';
 import './App.css';
 
 const isLoggingEnabled = true; // Set to false to disable logging
@@ -206,6 +205,8 @@ const App = () => {
 	const [animationData, setAnimationData] = useState(null);
 	const [fileSize, setFileSize] = useState(null);
 	const [isFilePickerOpen, setIsFilePickerOpen] = useState(false);
+	const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+	const [errorMessage, setErrorMessage] = useState('');
 
 	// This effect is called when the component mounts and it fetches the root directory of the file system
 	useEffect(() => {
@@ -293,6 +294,11 @@ const App = () => {
 		});
 	};
 	
+	function lottieValidate(jsonData) {
+		const requiredKeys = ['v', 'fr', 'ip', 'op', 'w', 'h', 'nm', 'assets', 'layers'];
+		return requiredKeys.every(key => key in jsonData);
+	}
+
 	// This function is called when the user clicks the "Choose File" button
 	const handleChooseFile = async () => {
 		// Prevent opening multiple file pickers
@@ -308,16 +314,25 @@ const App = () => {
 
 			if (typeof result === 'string') {
 				const animationJson = await readTextFile(result);
-				setAnimationData(JSON.parse(animationJson));
+				const animationJsonTXT = JSON.parse(animationJson);
+				
+				if (lottieValidate(animationJsonTXT)) {
 
-				const binaryData = await readBinaryFile(result);
-				const sizeInKb = binaryData.length / 1024;
-				setFileSize(sizeInKb);
+					setAnimationData(JSON.parse(animationJson));
 
-				const pathSegments = result.split('/');
-				pathSegments.pop(); // Remove the file name
-				const directoryPath = pathSegments.join('/');
-				handleSelect(directoryPath); // Update tree navigation
+					const binaryData = await readBinaryFile(result);
+					const sizeInKb = binaryData.length / 1024;
+					setFileSize(sizeInKb);
+
+					const pathSegments = result.split('/');
+					pathSegments.pop(); // Remove the file name
+					const directoryPath = pathSegments.join('/');
+					handleSelect(directoryPath); // Update tree navigation
+				} else {
+					log('Not a Lottie JSON file');
+					setErrorMessage('The selected file is not a Lottie JSON. Please select a valid Lottie JSON.');
+					setIsErrorModalOpen(true);
+				}
 			}
 		} catch (error) {
 			console.error('Error opening file dialog:', error);
@@ -332,19 +347,37 @@ const App = () => {
 			// Check if the file has a .json extension
 			if (filePath.endsWith('.json')) {
 				const animationJson = await readTextFile(filePath);
-				setAnimationData(JSON.parse(animationJson));
-
-				// Additionally, get the file size using Tauri's File System API
-				const binaryData = await readBinaryFile(filePath);
-				const sizeInKb = binaryData.length / 1024;
-				setFileSize(sizeInKb); // Update state with the file size
-			} else {
+				const animationJsonTXT = JSON.parse(animationJson);
+				if (lottieValidate(animationJsonTXT)) {
+					setAnimationData(JSON.parse(animationJson));
+					// Additionally, get the file size using Tauri's File System API
+					const binaryData = await readBinaryFile(filePath);
+					const sizeInKb = binaryData.length / 1024;
+					setFileSize(sizeInKb); // Update state with the file size
+				} else {
+					log('Not a Lottie JSON file');
+					setErrorMessage('The selected file is not a Lottie JSON. Please select a valid Lottie JSON.');
+					setIsErrorModalOpen(true);
+				}
 			}
 		} catch (error) {
 		}
 	};
 	
-	
+	const ErrorModal = ({ isOpen, onClose, message }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="errorModalBackdrop">
+            <div className="errorModalContent">
+                <p>{message}</p>
+                <button onClick={onClose} className="errorCloseButton">Close</button>
+            </div>
+        </div>
+    );
+};
+
+
 	// Render the App component
 	return (
 		<div className="App">
@@ -391,6 +424,11 @@ const App = () => {
 					fileSize={fileSize}
 				/>}
 			</div>
+			<ErrorModal
+				isOpen={isErrorModalOpen}
+				onClose={() => setIsErrorModalOpen(false)}
+				message={errorMessage}
+			/>
 		</div>
 	);
 };
