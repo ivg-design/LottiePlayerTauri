@@ -257,32 +257,38 @@ const App = () => {
 	const isSelected = (path) => {
 		return selectedPath === path;
 	};
-	const handleChooseFile = async () => {
+	// This function is called when the user clicks the "Choose File" button
+		const handleChooseFile = async () => {
+		// Prevent opening multiple file pickers
+		if (isFilePickerOpen) return;
+
+		setIsFilePickerOpen(true);
+
 		try {
 			const result = await open({
 				multiple: false,
-				directory: false, // Ensure it's set to false to open files
+				directory: false, // Set to false to pick files only
 			});
+
 			if (typeof result === 'string') {
 				const animationJson = await readTextFile(result);
 				setAnimationData(JSON.parse(animationJson));
 
-				// Get the file size for the selected file
 				const binaryData = await readBinaryFile(result);
 				const sizeInKb = binaryData.length / 1024;
-				setFileSize(sizeInKb); // Update state with the file size
+				setFileSize(sizeInKb);
 
-				// Get path segments and update tree navigation
 				const pathSegments = result.split('/');
-				pathSegments.pop(); // Remove the file name to navigate to the containing folder
+				pathSegments.pop(); // Remove the file name
 				const directoryPath = pathSegments.join('/');
-				handleSelect(directoryPath); // This should update the tree view
+				handleSelect(directoryPath); // Update tree navigation
 			}
 		} catch (error) {
 			console.error('Error opening file dialog:', error);
+		} finally {
+			setIsFilePickerOpen(false); // Reset state regardless of success or failure
 		}
 	};
-
 	const handleSelect = (path) => {
 		setSelectedPath(path);
 		const pathSegments = path.split('/');
