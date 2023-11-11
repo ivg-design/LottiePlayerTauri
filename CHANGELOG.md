@@ -1,3 +1,10 @@
+## [1.3.16](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.15...v1.3.16) (2023-11-11)
+
+
+### Bug Fixes
+
+* scroll bar style & resize-handle height ([cdb8cd6](https://github.com/ivg-design/LottiePlayerTauri/commit/cdb8cd6a6a45a40774cba2d1159ac1172d8f5b6b))
+
 ## [1.3.15](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.14...v1.3.15) (2023-11-10)
 
 
