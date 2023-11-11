@@ -8,7 +8,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderTree, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import './NeumorphicButton.css';
 import './App.css';
+
 const isLoggingEnabled = true; // Set to false to disable logging
+
 // ERROR LOGGING
 function log(...messages) {
 	if (isLoggingEnabled) {
@@ -42,7 +44,6 @@ const sortItems = (items) => {
 /**
  * TreeNode component represents each node in a file tree structure.
  * It is responsible for rendering individual tree nodes, handling node expansion/collapse, and node selection.
- *
  */
 const TreeNode = React.forwardRef(({
 		item,
@@ -53,7 +54,6 @@ const TreeNode = React.forwardRef(({
 		onCollapse,
 		expandedPaths,
 		onFileSelected,
-		onHeightChange // This is a new prop to be passed from the App component
 	}, ref) => {
 		const [children, setChildren] = useState([]);
 		const isExpanded = expandedPaths.includes(item.path);
@@ -190,10 +190,12 @@ const TreeNode = React.forwardRef(({
 });
 
 
-// App component
+/** 
+ * App component represents the main application. 
+ * It is responsible for rendering the file tree and the animation player.
+ */
 const App = () => {
 	const [folderStructure, setFolderStructure] = useState([]);
-	const rootRef = useRef(null); // Create a ref for the root TreeNode if not already done
 	const [sidebarWidth, setSidebarWidth] = useState(200);
 	const [collapsed, setCollapsed] = useState(true);
 	const [isResizing, setIsResizing] = useState(false);
@@ -202,13 +204,10 @@ const App = () => {
 	const selectedRef = useRef(null);
 	const [isTreeToggled, setIsTreeToggled] = useState(false);
 	const [animationData, setAnimationData] = useState(null);
-	const [isPlaying, setIsPlaying] = useState(false);
 	const [fileSize, setFileSize] = useState(null);
 	const [isFilePickerOpen, setIsFilePickerOpen] = useState(false);
 
-
-	
-
+	// This effect is called when the component mounts and it fetches the root directory of the file system
 	useEffect(() => {
 		const fetchDir = async () => {
 			const rootPath = '/'; // Use your desired initial path
@@ -223,42 +222,79 @@ const App = () => {
 		fetchDir();
 	}, []);
 
+	// This effect is called when the selectedPath state changes and scrolls the selected item into view
 	useEffect(() => {
 		if (selectedRef.current) {
 			selectedRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 		}
 	}, [selectedPath]); // Only re-run if selectedPath changes
-
+	
+	// This function is called when the user clicks and drags the resize handle
 	const startResizing = useCallback((e) => {
-		e.preventDefault();
+		e.preventDefault(); // Prevent default behavior of the mouse down event
 		setIsResizing(true);
 	}, []);
-
+	
+	// This function is called when the user releases the mouse button after resizing
 	const stopResizing = useCallback(() => {
 		setIsResizing(false);
 	}, []);
 
+	//This function is called when  the user moves the mouse after clicking and dragging the resize handle
 	const resize = useCallback((e) => {
-		if (isResizing) {
+		if (isResizing) { 
 			setSidebarWidth(e.clientX);
 		}
 	}, [isResizing]);
-
+	
+	// This effect is called when the component mounts and adds event listeners for resizing
 	useEffect(() => {
-		window.addEventListener('mousemove', resize);
-		window.addEventListener('mouseup', stopResizing);
+		window.addEventListener('mousemove', resize); // Add event listeners for resizing
+		window.addEventListener('mouseup', stopResizing); // Add event listeners for stopping resizing
 
 		return () => {
-			window.removeEventListener('mousemove', resize);
+			window.removeEventListener('mousemove', resize); 
 			window.removeEventListener('mouseup', stopResizing);
 		};
 	}, [resize, stopResizing]);
 
+	// This function is called when the user clicks on a file in the file tree and returns true if the file is selected
 	const isSelected = (path) => {
-		return selectedPath === path;
+		return selectedPath === path;// Return true if the selectedPath state matches the path
 	};
+	
+	//This function is called when a file is selected in the file tree for the purpose of navigation the tree
+	const handleSelect = (path) => {
+		setSelectedPath(path);
+		const pathSegments = path.split('/');
+		const pathsToExpand = pathSegments.reduce((acc, segment, index) => {
+			const path = index === 0 ? segment : `${acc[index - 1]}/${segment}`;
+			acc.push(path);
+			return acc;
+		}, []);
+
+		setExpandedPaths(pathsToExpand);
+	};
+
+	// This function is called when a file is selected in the file tree for the purpose of expanding the tree
+	const handleExpand = (path) => {
+	setExpandedPaths(prevPaths => {
+		if (!prevPaths.includes(path)) {
+			return [...prevPaths, path];
+		}
+		return prevPaths;
+	});
+	};
+	
+	// This function is called when a file is selected in the file tree for the purpose of collapsing the tree
+	const handleCollapse = (path) => {
+		setExpandedPaths(prevPaths => {
+			return prevPaths.filter(p => p !== path);
+		});
+	};
+	
 	// This function is called when the user clicks the "Choose File" button
-		const handleChooseFile = async () => {
+	const handleChooseFile = async () => {
 		// Prevent opening multiple file pickers
 		if (isFilePickerOpen) return;
 
@@ -289,34 +325,8 @@ const App = () => {
 			setIsFilePickerOpen(false); // Reset state regardless of success or failure
 		}
 	};
-	const handleSelect = (path) => {
-		setSelectedPath(path);
-		const pathSegments = path.split('/');
-		const pathsToExpand = pathSegments.reduce((acc, segment, index) => {
-			const path = index === 0 ? segment : `${acc[index - 1]}/${segment}`;
-			acc.push(path);
-			return acc;
-		}, []);
-
-		setExpandedPaths(pathsToExpand);
-	};
-
-
-	const handleExpand = (path) => {
-		setExpandedPaths(prevPaths => {
-			if (!prevPaths.includes(path)) {
-				return [...prevPaths, path];
-			}
-			return prevPaths;
-		});
-	};
-
-	const handleCollapse = (path) => {
-		setExpandedPaths(prevPaths => {
-			return prevPaths.filter(p => p !== path);
-		});
-	};
-
+	
+	// This function is called when a file is selected in the file tree for the purpose of loading and playing the animation
 	const handleFileSelected = async (filePath) => {
 		try {
 			// Check if the file has a .json extension
@@ -334,6 +344,8 @@ const App = () => {
 		}
 	};
 	
+	
+	// Render the App component
 	return (
 		<div className="App">
 			<div className="sidebar" style={{ width: `${sidebarWidth}px` }}>

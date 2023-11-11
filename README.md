@@ -1,70 +1,64 @@
-# Lottie Player Application (WIP)
+# Lottie Player Tauri - README.md
 
 ## Overview
-The Lottie Player Application is a dynamic Tauri-based platform currently under development. It is designed for animators and developers who wish to interact with Lottie animations. The application enables users to select, view, and control Lottie animations embedded in `.json` or `.html` files, and will be available as a compiled multi-platform application .
+
+Lottie Player Tauri is a desktop application developed using Tauri and React, designed for playing and interacting with Lottie animations. It provides a rich interface with advanced features and controls for Lottie animations, making it a versatile tool for designers and developers. This project is actively developed, and new features are continually being added.
 
 ## Features
-- **File Selection:** Choose individual or multiple files or folders containing Lottie animations.
-- **Animation Playback:** Play, pause, rewind, or loop animations. Access playback for specific segments.
-- **Custom Controls:** Modify the appearance of animation elements in real-time.
-- **Lottie-API Integration:** Apply Lottie-API for asynchronous animation customization and advanced interaction.
 
-## Getting Started
-Clone the repository to your local environment to get started:
+### Current Features
 
-```bash
-git clone https://github.com/your-repository/lottie-player.git
-```
+- **Animation Playback**: Users can load and play Lottie animations.
+- **Play/Pause Control**: Integrated play and pause functionality with UI feedback.
+- **Progress Tracking**: Ability to see and control the progress of the animation.
+- **Color Customization**: The application includes a color picker for customizing the background.
+- **Animation Information**: Display detailed information about the Lottie file, such as frame rate, duration, and size.
+- **TreeView for File Selection**: Browse and select files using a TreeView structure.
+- **File Selection**: Select Lottie files using both a file picker and the TreeView.
 
-### Prerequisites
-- Node.js
-- npm or Yarn
-- Tauri
-- A modern web browser
+### Planned Features
 
-### Installation
-Install the required dependencies within the cloned repository:
+- **Marker Playback**: Jump to and play specific markers within Lottie animations.
+- **Segment Playback**: Ability to play specific segments of an animation.
+- **Style Updates to Lottie Elements**: Update styles (color, stroke, etc.) of Lottie elements within the application.
+- **Class Addition to Lottie Elements**: Ability to add classes to Lottie elements and save the modified Lottie file.
+- **Interactivity Processing**: Add interactive elements to Lottie animations and generate code snippets for integration.
 
-```bash
-cd lottie-player
-npm install
-```
+## Installation and Usage
 
-### Running the Application
-To launch the application, execute:
+To set up and use Lottie Player Tauri, follow these steps:
 
-```bash
-npm run tauri dev
-```
+1. **Clone the Repository**: Clone the repository from [GitHub](https://github.com/ivg-design/LottiePlayerTauri).
+2. **Install Dependencies**:
+   - Install [Rust](https://www.rust-lang.org/tools/install) and [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html).
+   - Ensure [Node.js](https://nodejs.org/en/) is installed.
+   - Install Tauri CLI globally using `npm install -g @tauri-apps/cli` or `yarn global add @tauri-apps/cli`.
+   - Run `npm install` or `yarn install` in the project directory to install necessary JavaScript dependencies.
+3. **Build and Run the Application**:
+   - Use `cargo tauri dev` to start the application in development mode.
+   - Use `cargo tauri build` to build the application for production.
 
-This command will start the application in development mode.
+## Development
 
-## Usage
-When you start the application, you'll be presented with an interface to select Lottie animation files. The application allows for comprehensive file navigation and manipulation of animations.
+The application's entry point is `App.js`, which sets up the React components and integrates the Tauri functionalities. Key components include:
 
-### File Navigation
-- Browse folders using the sidebar.
-- Select an animation file to view it.
+- `App.js`: Application entrypoint contains the main app and treeNode components.
+- `PlayerUI.js`: The main interface for the Lottie player, containing playback controls and display elements.
+- `LottiePlayer.js`: Renders the Lottie animation.
+- `LottieInfoParser.js`: Parses Lottie file data and displays animation details.
 
-### Animation Controls
-Controls available in the application include:
-- **Play/Pause:** Toggle animation playback.
-- **Segments:** Isolate and play defined segments of the animation.
-- **Modify Elements:** Adjust properties such as color and opacity of animation elements.
-- **Lottie-API Controls:** Use custom JavaScript code for interacting with animations programmatically.
+## Contribution
 
-## Contributing
-We encourage contributions to the Lottie Player Application. Please make sure to update tests as appropriate.
+We welcome contributions! If you're interested in contributing, feel free to submit pull requests or open issues for bugs and feature requests.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
-## Acknowledgments
-- Thanks to LottieFiles for providing the Lottie-web library.
-- Appreciation to all contributors who are helping to enhance this tool.
+This project is licensed under the [MIT License](LICENSE.md).
 
-## Contact
-For any inquiries, please reach out to [IVG Design](mailto:ilyav@gusinski.us)
+## Note
 
-## Changelog
-For a comprehensive list of changes made to the application, refer to the [CHANGELOG.md](CHANGELOG.md) file.
+This project is in a development phase, and the features listed are subject to change. The repository is regularly updated, and we aim to bring more functionality and improvements to the Lottie Player Tauri application.
+
+---
+
+*This README.md provides a comprehensive guide to the Lottie Player Tauri project. For the most current information, please refer to the project's [GitHub repository](https://github.com/ivg-design/LottiePlayerTauri).*
