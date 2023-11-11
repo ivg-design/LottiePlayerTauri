@@ -15,16 +15,35 @@ function log(...messages) {
 		console.log(...messages);
 	}
 }
-// Helper function to sort items
+// updated sort function that smart sorts numbers without needing leading zeros
 const sortItems = (items) => {
 	return items.sort((a, b) => {
 		if (a.is_dir && !b.is_dir) return -1;
 		if (!a.is_dir && b.is_dir) return 1;
+
+		// Extracting numbers from file names for comparison
+		const regex = /^\d+/; // Regex to match leading numbers in a file name
+		const numA = a.name.match(regex);
+		const numB = b.name.match(regex);
+
+		// If both are numeric, compare as numbers
+		if (numA && numB) {
+			const numberA = parseInt(numA[0], 10);
+			const numberB = parseInt(numB[0], 10);
+			if (numberA !== numberB) {
+				return numberA - numberB;
+			}
+		}
+
+		// If only one is numeric, or if numeric parts are equal, compare as strings
 		return a.name.localeCompare(b.name);
 	});
 };
-
-// TreeNode component
+/**
+ * TreeNode component represents each node in a file tree structure.
+ * It is responsible for rendering individual tree nodes, handling node expansion/collapse, and node selection.
+ *
+ */
 const TreeNode = React.forwardRef(({
 		item,
 		level = 0,
@@ -33,100 +52,99 @@ const TreeNode = React.forwardRef(({
 		onExpand,
 		onCollapse,
 		expandedPaths,
-		onFileSelected // This is a new prop to be passed from the App component
+		onFileSelected,
+		onHeightChange // This is a new prop to be passed from the App component
 	}, ref) => {
 		const [children, setChildren] = useState([]);
 		const isExpanded = expandedPaths.includes(item.path);
 		const itemRef = ref || React.createRef(); // Use the forwarded ref or create a new one
+		const indentSize = 20;
+		const nodeHeight = 18; // Assuming each node has a fixed height of 30px
 
-
-	// Update your expand function
-	const expand = useCallback(async (item) => {
-		if (item.is_dir && !isExpanded) {
-			try {
-				const result = await invoke('read_dir', { path: item.path });
-				const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result));
-				setChildren(sortedChildren);
-				onExpand(item.path);
-			} catch (error) {
-				console.error('Error reading directory:', error);
-			}
-		}
-	}, [item.is_dir, item.path, isExpanded, onExpand]);
-
-	// Updated collapse function
-	const collapse = useCallback(() => {
-		if (isExpanded) {
-			setChildren([]);
-			onCollapse(item.path);
-		}
-	}, [item.path, isExpanded, onCollapse]);
-
-	useEffect(() => {
-		const performExpand = async () => {
-			if (item.is_dir && isExpanded) {
+		// Callback function to be passed to TreeNode, which is called when a child node is expanded
+		const expand = useCallback(async (item) => {
+			if (item.is_dir && !isExpanded) { // Only expand if the node is a directory and not already expanded
 				try {
-					const result = await invoke('read_dir', { path: item.path });
-					const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result));
-					setChildren(sortedChildren);
+					const result = await invoke('read_dir', { path: item.path }); // Use Tauri's File System API to read the directory
+					const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result)); //
+					setChildren(sortedChildren); // Update the children state
+					onExpand(item.path);// Call the onExpand callback function
 				} catch (error) {
 					console.error('Error reading directory:', error);
 				}
 			}
+		}, [item.is_dir, item.path, isExpanded, onExpand]); // Depend on the item path, isExpanded state, and onExpand callback function
+
+		// Callback function to be passed to TreeNode, which is called when a child node is collapsed
+		const collapse = useCallback(() => {
+			if (isExpanded) { // Only collapse if the node is already expanded
+				setChildren([]); // Clear the children state
+				onCollapse(item.path); // Call the onCollapse callback function
+			}
+		}, [item.path, isExpanded, onCollapse]); // Depend on the item path, isExpanded state, and onCollapse callback function
+
+	 	// This effect is called when the children state changes and reports the height change to the parent   
+		useEffect(() => { 
+			const performExpand = async () => { // Define an async function to perform the expansion
+				if (item.is_dir && isExpanded) { // Only expand if the node is a directory and is expanded
+					try {
+						const result = await invoke('read_dir', { path: item.path });// Use Tauri's File System API to read the directory
+						const sortedChildren = sortItems(Array.isArray(result) ? result : JSON.parse(result));// Sort the children
+						setChildren(sortedChildren); // Update the children state
+					} catch (error) {
+						console.error('Error reading directory:', error);
+					}
+				}
+			};
+			performExpand();// Call the async function to perform the expansion
+		}, [item, isExpanded, invoke]);// Depend on the item, isExpanded state, and invoke function
+
+		// This effect is called when the children state changes and reports the height change to the parent
+		useEffect(() => {
+			// Only scroll into view if the current item is selected and not already in view 
+			if (isSelected(item.path) && !isItemInView(itemRef.current)) { 
+				itemRef.current.scrollIntoView({ // Scroll the item into view
+					behavior: 'smooth',// Use smooth scrolling
+					block: 'nearest',// Scroll to the bottom of the item
+				});
+			}
+		}, [isSelected, item.path, itemRef]);
+
+		// Helper function to check if the element is in view
+		function isItemInView(element) {
+			if (!element) {
+				return false;
+			}
+			const rect = element.getBoundingClientRect();
+			return (
+				rect.top >= 0 &&
+				rect.left >= 0 &&
+				rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+				rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+			);
+		}
+
+		const handleToggle = (e) => {
+			e.stopPropagation();
+			if (item.is_dir) {
+				if (isExpanded) {
+					collapse(); // Ensure this function is called when collapsing
+				} else {
+					expand(item).catch(console.error);
+				}
+			}
 		};
 
-		performExpand();
-	}, [item, isExpanded, invoke]);
+		const handleClick = (e) => {
+			e.stopPropagation();
+			onSelected(item.path); // Existing selection handling
 
-	useEffect(() => {
-		// Only scroll into view if the current item is selected and not already in view
-		if (isSelected(item.path) && !isItemInView(itemRef.current)) {
-			itemRef.current.scrollIntoView({
-				behavior: 'smooth',
-				block: 'nearest'
-			});
-		}
-	}, [isSelected, item.path, itemRef]);
-
-	// Helper function to check if the element is in view
-	function isItemInView(element) {
-		if (!element) {
-			return false;
-		}
-		const rect = element.getBoundingClientRect();
-		return (
-			rect.top >= 0 &&
-			rect.left >= 0 &&
-			rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-			rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-		);
-	}
-
-
-	const handleToggle = (e) => {
-		e.stopPropagation();
-		if (item.is_dir) {
-			if (isExpanded) {
-				collapse(); // Ensure this function is called when collapsing
-			} else {
-				expand(item).catch(console.error);
+			// If the item is a file, trigger the event to load and play the animation
+			if (!item.is_dir) {
+				onFileSelected(item.path); // This is a new prop function to be passed from the App component
 			}
-		}
-	};
+		};
 
-	const handleClick = (e) => {
-		e.stopPropagation();
-		onSelected(item.path); // Existing selection handling
-
-		// If the item is a file, trigger the event to load and play the animation
-		if (!item.is_dir) {
-			onFileSelected(item.path); // This is a new prop function to be passed from the App component
-		}
-	};
-
-
-
-		const indentSize = 20;
 
 		return (
 			<div>
@@ -175,6 +193,7 @@ const TreeNode = React.forwardRef(({
 // App component
 const App = () => {
 	const [folderStructure, setFolderStructure] = useState([]);
+	const rootRef = useRef(null); // Create a ref for the root TreeNode if not already done
 	const [sidebarWidth, setSidebarWidth] = useState(200);
 	const [collapsed, setCollapsed] = useState(true);
 	const [isResizing, setIsResizing] = useState(false);
@@ -184,23 +203,11 @@ const App = () => {
 	const [isTreeToggled, setIsTreeToggled] = useState(false);
 	const [animationData, setAnimationData] = useState(null);
 	const [isPlaying, setIsPlaying] = useState(false);
-	const [progress, setProgress] = useState(0);
-	const lottieRef = useRef(null);
 	const [fileSize, setFileSize] = useState(null);
-	const resizeHandleRef = useRef(null);
-	const treeNodesContainerRef = useRef(null);
+	const [isFilePickerOpen, setIsFilePickerOpen] = useState(false);
 
-	useEffect(() => {
-		if (treeNodesContainerRef.current) {
-			const treeNodes = Array.from(treeNodesContainerRef.current.getElementsByClassName('treeChildren'));
-			const tallestNodeHeight = Math.max(...treeNodes.map(node => node.offsetHeight));
 
-			if (resizeHandleRef.current) {
-				resizeHandleRef.current.style.height = `${tallestNodeHeight}px`;
-			}
-		}
-
-	}, []); // Add dependencies if needed
+	
 
 	useEffect(() => {
 		const fetchDir = async () => {
@@ -323,7 +330,7 @@ const App = () => {
 	
 	return (
 		<div className="App">
-			<div className="sidebar" ref={treeNodesContainerRef} style={{ width: `${sidebarWidth}px` }}>
+			<div className="sidebar" style={{ width: `${sidebarWidth}px` }}>
 				<div className="sidebar-header">
 					<button
 						onClick={() => {
@@ -335,9 +342,11 @@ const App = () => {
 						<FontAwesomeIcon icon={faFolderTree} className="icon-large" />
 					</button>
 					<button onClick={handleChooseFile} className="button">
-						<FontAwesomeIcon icon={faFileImport} className = "icon-large"/>
+						<FontAwesomeIcon icon={faFileImport} className="icon-large" />
 					</button>
 				</div>
+				<div className = "treeContainer">
+					<div className="resize-handle" onMouseDown={startResizing} />
 				{!collapsed &&
 					folderStructure.map((item, index) => (
 						<TreeNode
@@ -349,10 +358,10 @@ const App = () => {
 							onExpand={handleExpand}
 							onCollapse={handleCollapse}
 							expandedPaths={expandedPaths}
-							onFileSelected={handleFileSelected} // Pass the new function as a prop to TreeNode
+							onFileSelected={handleFileSelected}
 						/>
 					))}
-				<div className="resize-handle" ref={resizeHandleRef} onMouseDown={startResizing} />
+					</div>
 			</div>
 			<div className="mainArea">
 				<div className="appName">

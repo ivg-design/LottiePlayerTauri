@@ -31,12 +31,13 @@
   background-color: #20222C;
   height: 100%;
   width: 440px;
-  overflow-y: auto;
+  overflow: auto;
   user-select: none;
 }
 .sidebar-header{
   position:sticky;
   top:0;
+  z-index: 100;
 }
 .sidebar-content {
   height: calc(100vh - 40px);
@@ -48,9 +49,9 @@
   flex-direction: column;
   padding: 20px;
 }
-
 .buttonContainer {
   padding-top: 20px;
+  z-index: 100;
 }
 /* Additional styles for the tree nodes if needed */
 .treeNode {
@@ -75,11 +76,16 @@ h1 {
   font-size: 2rem;
   /* Add more Neumorphic styles here */
 }
+.treeContainer{
+  position:relative;
+}
+
 .resize-handle {
   width: 10px;
   /* Make it a bit wider to ensure it's easily grabbable */
-  height: 100vh;
+  height: 100%;
   position:fixed;
+  margin-left: 10px;
   background-color: #666;
   /* Use a darker color for visibility */
   position: absolute;
@@ -153,25 +159,51 @@ h1 {
   font-weight: 500;
   line-height: normal;
   transition: all 300ms ease-in-out;
-
+}
+.button-toggled{
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  border: 2px solid #FFD739;
+  background: linear-gradient(180deg, #B97208 0%, #FFD800 100%);
+  box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
+  color: #20222C;
+  text-align: center;
+  font-family: Inter;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  transition: all 300ms ease-in-out;
+}
+/* Styles for the scrollbar track (the part the scrollbar sits in) */
+::-webkit-scrollbar-track {
+  border-radius: 2px;
+  background: linear-gradient(90deg, #B97208 0%, #FFD800 100%);
+  box-shadow: 3px 3px 6px 0px #010102, -2px -2px 4px 0px #feffff;
+  
+  overflow: visible;
+  /* Track background color */
 }
 
-.button-toggled{
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-    border-radius: 5px;
-    border: 2px solid #FFD739;
-    background: linear-gradient(180deg, #B97208 0%, #FFD800 100%);
-    box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
-    color: #20222C;
-    text-align: center;
-    font-family: Inter;
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    transition: all 300ms ease-in-out;
+/* Styles for the scrollbar thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #555555 0%, #888888 100%);
+  cursor: pointer;/* Thumb background color */
+}
 
-  }
+/* Handle hover and active states for the scrollbar thumb */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #333333 0%, #555555 100%);  /* Thumb background color on hover */
+  cursor: grab !important;
+      /* Thumb background color */
+}
 
+/* Styles for the scrollbar itself (including width and height) */
+::-webkit-scrollbar {
+  width: 10px;
+  /* Width of the vertical scrollbar */
+  height: 10px;
+  /* Height of the horizontal scrollbar */
+}
