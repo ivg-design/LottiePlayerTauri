@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.17...v1.4.0) (2023-11-11)
+
+
+### Features
+
+* add lottie validation ([5422a6f](https://github.com/ivg-design/LottiePlayerTauri/commit/5422a6f46397a838673da44e4c6ae8b4baf0fa64))
+
 ## [1.3.17](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.16...v1.3.17) (2023-11-11)
 
 
