@@ -1,3 +1,10 @@
+## [1.3.17](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.16...v1.3.17) (2023-11-11)
+
+
+### Performance Improvements
+
+* make sure that multiple clicks open one menu ([6b827a7](https://github.com/ivg-design/LottiePlayerTauri/commit/6b827a7e0fe228fe9abf0216fe589b9a3622c17a))
+
 ## [1.3.16](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.15...v1.3.16) (2023-11-11)
 
 
