@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.4.0...v1.5.0) (2023-11-12)
+
+
+### Features
+
+* working on improving lottie parser ([a8e80cc](https://github.com/ivg-design/LottiePlayerTauri/commit/a8e80cc8d1c90b11cbc68186a5a716338c4f66c2))
+
 # [1.4.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.3.17...v1.4.0) (2023-11-11)
 
 
