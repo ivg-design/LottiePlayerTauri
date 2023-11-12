@@ -1,0 +1,107 @@
+/* LottieTreeParser.css */
+
+.modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent backdrop */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    /* Ensure it's above other content */
+}
+
+.modalContent {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 80%;
+    /* Adjust as needed */
+    max-height: 90%;
+    /* Adjusted for better modal layout */
+    overflow: auto;
+    /* Scroll for both horizontal and vertical overflow */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.treeContainer {
+    width: 100%;
+    /* Full width of the modal content */
+    height: 80vh;
+    /* Adjust based on your needs */
+    overflow: scroll;
+    /* Allows scrolling within the tree container if needed */
+    padding: 10px;
+    box-sizing: border-box;
+}
+/* Style adjustments for the tree nodes */
+.node {
+    cursor: pointer;
+    fill: #007bff;
+    /* Node color */
+    stroke: #fff;
+    /* Node border color */
+}
+
+.node text {
+    font-size: 14px;
+    /* Increased text size */
+    fill: #333;
+    /* A dark color for the text */
+}
+
+.foreignObject div {
+    color: #333;
+    /* Text color inside the foreignObject */
+    font-size: 12px;
+    /* Text size */
+    overflow: hidden;
+    /* Adjust as necessary */
+    width: 100%;
+    /* Ensure the div uses all the allocated space */
+    height: auto;
+    /* Let the height adjust based on content */
+    background: #fff;
+    /* Background to contrast the text */
+}
+
+/* Ensure that SVG text elements are visible */
+.node g text {
+    visibility: visible;
+}
+
+.node circle {
+    fill: #007bff;
+    /* Circle color for nodes */
+    stroke: #fff;
+    /* Circle border color */
+}
+
+.link {
+    fill: none;
+    stroke: #ccc;
+    /* Color of the links/lines between nodes */
+    stroke-width: 2px;
+    /* Width of the links/lines */
+}
+
+/* Additional styling for node focus and interaction */
+.node:hover {
+    fill: #0056b3;
+    /* Change color on hover */
+}
+
+/* Style for foreignObject elements within nodes */
+.foreignObject {
+    overflow: visible;
+    /* Ensure the content is fully visible */
+}
+
+/* Add more styling as needed */

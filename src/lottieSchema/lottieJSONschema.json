@@ -6,6 +6,7 @@
             "$ref": "#/$defs/animation/animation"
         }
     ],
+
     "$defs": {
         "animated-properties": {
             "keyframe": {
@@ -5266,7 +5267,7 @@
                 ]
             }
         },
-        "text": {
+           "text": {
             "text-document": {
                 "type": "object",
                 "title": "Text Document",

@@ -7,6 +7,8 @@ import { ReactComponent as ProgressBar } from './svgUIelements/progressBar.svg';
 import { ReactComponent as ProgressBarHandle } from './svgUIelements/progressBarHandle.svg';
 import ColorPicker from 'react-best-gradient-color-picker';
 import LottieInfoParser from './LottieInfoParser';
+import LottieTreeParser from './LottieTreeParserN';
+
 const isLoggingEnabled = true;  // Set to false to disable logging
 
 // ERROR LOGGING
@@ -34,6 +36,10 @@ const PlayerUI = ({ animationData, version, fileSize }) => {
         durationFrames: 0,
         durationSeconds: 0,
     });
+    const [isTreeModalVisible, setIsTreeModalVisible] = useState(false);
+    const toggleTreeModal = () => {
+        setIsTreeModalVisible(!isTreeModalVisible);
+    };
     const [markerStartFrame, setMarkerStartFrame] = useState(null);
 
 
@@ -279,9 +285,16 @@ const PlayerUI = ({ animationData, version, fileSize }) => {
                         </div>
                     )}
                     {/* New Code Compare button */}
-                    <button className="segmentsButton noSelect">
+                    <button className="segmentsButton noSelect" onClick={toggleTreeModal}>
                         <FontAwesomeIcon icon={faCodeCompare} className="icon-large" />
                     </button>
+
+                    {isTreeModalVisible && (
+                        <LottieTreeParser
+                            animationData={animationData}
+                            onClose={toggleTreeModal} // Pass the function to close the modal
+                        />
+                    )}
 
                     {isPickerVisible && (
                         <div className="colorPickerModal noSelect" onClick={handleModalClick} style={{ backgroundColor: 'white' }}>

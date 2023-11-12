@@ -1,0 +1,12 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "lldb",
+			"request": "attach",
+			"name": "Attach to Tauri Dev",
+			"pid": "${command:pickProcess}", // This will allow you to pick the process to attach to
+			"cwd": "${workspaceFolder}"
+		}
+	]
+}
