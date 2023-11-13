@@ -46,7 +46,7 @@ var data = {
             }
         }
     ]
-
+ 
 };
 
 if (layers[i].ty == 4 { //shapeLayerr
