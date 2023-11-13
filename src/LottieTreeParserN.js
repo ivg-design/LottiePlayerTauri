@@ -3,14 +3,6 @@ import './LottieTreeParser.css';
 
 //TODO: retrieve information base information about the animation its name and duration in frames and seconds, set that info as the root node of the tree
 
-const parseKeyframe = (keyframe) => {
-    return {
-        frame: keyframe.t,
-        value: keyframe.s.map(value => parseFloat(value.toFixed(2)))
-    };
-};
-
-
 const propertyKeyMapping = {
     // Global layer properties
     'nm': { name: 'Name', type: 'string' }, // Name of the object
@@ -135,7 +127,7 @@ const formatKeyframes = (keyframes) => {
 };
 
 // Function to handle both static and animated properties
-const parseProperty = (property) => {
+const parseKeyframes = (property) => {
     if (property.a === 1 && Array.isArray(property.k)) { // Check if property is animated
         const formattedKeyframes = formatKeyframes(property.k);
         // Create an array of startKey/endKey pairs
@@ -155,32 +147,35 @@ const parseProperty = (property) => {
     }
 };
 
-// Modify the parseLayerTransforms function to use the new parseProperty function
+// Function to parse layer transforms and include Name and LayerType using propertyKeyMapping
 const parseLayerTransforms = (layer) => {
     const parsedTransforms = {
         Name: layer.nm,
-        Type: propertyKeyMapping[layer.ty]?.name || `Type ${layer.ty}`,
+        LayerType: propertyKeyMapping.layerTypes[layer.ty] || `Unknown Type (${layer.ty})`,
         InPoint: layer.ip,
         OutPoint: layer.op
     };
 
     // Parse keyframe transform properties
     for (const key in layer.ks) {
-        const propertyInfo = propertyKeyMapping.ks[key];
-        if (propertyInfo) {
-            const propertyName = propertyInfo.name || key;
-            const transformProperty = layer.ks[key];
+        if (layer.ks.hasOwnProperty(key)) {
+            const propertyInfo = propertyKeyMapping.ks[key];
+            if (propertyInfo) {
+                const propertyName = propertyInfo.name || key;
+                const transformProperty = layer.ks[key];
 
-            // Now use the parseProperty function to parse the property
-            parsedTransforms[propertyName] = parseProperty(transformProperty);
-        } else {
-            // Default handling for unmapped keys
-            parsedTransforms[key] = layer.ks[key];
+                // Use the parseKeyframes function to parse the property
+                parsedTransforms[propertyName] = parseKeyframes(transformProperty);
+            } else {
+                // Default handling for unmapped keys
+                parsedTransforms[key] = layer.ks[key];
+            }
         }
     }
 
     return parsedTransforms;
 };
+
 
 const parseShapeLayer = (layer) => {
     const parseShapeProperties = (shape) => {
@@ -230,7 +225,6 @@ const parseTextLayer = (layer) => {
     };
 };
 
-/**************** MAIN FUNCTION **************/
 // Updated parseLayers function to handle precomp layers
 const parseLayers = (layers) => {
     return layers.map(layer => {
@@ -281,16 +275,12 @@ const formatValue = (value) => {
     return value;
 };
 
-// Function to create a node for the tree
+// Function to create a node for the tree with different display for animated and static keyframes
 const createNode = (item, depth = 0) => {
-    // Check if the item is a layer and has a Name or Match Name, otherwise use 'Unnamed Node'
     const nodeName = item.Name || item.mn || 'Unnamed Node';
-    // Determine the layer type
     const layerType = item.LayerType || '';
-    // Create the node label
     const nodeLabel = `${nodeName} || (${layerType})`;
 
-    // Create the base node object
     const node = {
         id: item.id || `node-${Math.random().toString(36).substr(2, 9)}`,
         Name: nodeLabel.trim(),
@@ -298,20 +288,35 @@ const createNode = (item, depth = 0) => {
         isFolder: false
     };
 
-    // Add the properties as children if they exist
+    // Process each property
     ['Position', 'Rotation', 'Opacity', 'Scale', 'Skew', 'Skew Axis'].forEach(prop => {
         if (item[prop] !== undefined) {
-            node.children.push({
-                id: `${node.id}-${prop}`,
-                Name: `${prop}: ${formatValue(item[prop])}`,
-                children: [],
-                isFolder: false
-            });
-            node.isFolder = true; // Mark as a folder since it has children
+            const propValue = item[prop];
+            if (Array.isArray(propValue)) { // Animated
+                const keyframesDisplay = propValue.map((kf, index) => {
+                    const startKey = kf.startKey ? `startKey:{frame:${kf.startKey.frame}, value:[${kf.startKey.value.join(', ')}]}` : '';
+                    const endKey = kf.endKey ? `endKey:{frame:${kf.endKey.frame}, value:[${kf.endKey.value.join(', ')}]}` : '';
+                    return <div key={index}>{`${startKey}${endKey ? ', ' + endKey : ''}`}</div>;
+                });
+
+                node.children.push({
+                    id: `${node.id}-${prop}`,
+                    Name: <div>{`${prop}:`}<div style={{ marginLeft: '20px' }}>{keyframesDisplay}</div></div>,
+                    children: [],
+                    isFolder: false
+                });
+            } else { // Static
+                node.children.push({
+                    id: `${node.id}-${prop}`,
+                    Name: `${prop}: ${formatValue(propValue.value)}`,
+                    children: [],
+                    isFolder: false
+                });
+            }
+            node.isFolder = true;
         }
     });
 
-    // Recursively add precomp_contents and Shapes if they exist
     if (item.precomp_contents) {
         node.children.push(...item.precomp_contents.map(child => createNode(child, depth + 1)));
         node.isFolder = true;
@@ -324,11 +329,13 @@ const createNode = (item, depth = 0) => {
 };
 
 
+
+
 const convertToTreeStructure = (parsedData) => {
     return parsedData.map((layer, index) => createNode(layer, '', 0));
 };
 
-const PropertyRenderer = ({ property }) => {
+const KeyframePropertyRenderer = ({ property }) => {
     if (Array.isArray(property)) {
         return property.map((kf, index) => (
             <div key={index}>
@@ -367,7 +374,7 @@ const LottieTreeNode = ({ item, level = 0 }) => {
                     {item.children.map((child, index) => (
                         // Check if the child is a property to be rendered
                         typeof child === 'object' && child.hasOwnProperty('frame') ?
-                            <PropertyRenderer key={index} property={child} /> :
+                            <KeyframePropertyRenderer key={index} property={child} /> :
                             <LottieTreeNode key={child.id} item={child} level={level + 1} />
                     ))}
                 </div>
