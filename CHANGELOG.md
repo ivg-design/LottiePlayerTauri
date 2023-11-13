@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.5.0...v1.5.1) (2023-11-13)
+
+
+### Bug Fixes
+
+* test symantic release 1 ([999b6de](https://github.com/ivg-design/LottiePlayerTauri/commit/999b6de86d5ea942b67965abc6abccfb1dfad5be))
+
 # [1.5.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.4.0...v1.5.0) (2023-11-12)
 
 
