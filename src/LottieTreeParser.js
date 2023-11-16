@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tree } from 'react-d3-tree';
 import './LottieTreeParser.css';
+import PropertyKeyMapping from './propertyKeyMapping';
 
 const LottieTreeParser = ({ animationData, onClose }) => {
     const [treeData, setTreeData] = useState(null);
