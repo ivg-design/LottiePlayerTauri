@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.5.1...v1.6.0) (2023-11-16)
+
+
+### Features
+
+* add new more robust lottieparser ([392015f](https://github.com/ivg-design/LottiePlayerTauri/commit/392015ff6a6e954b47e8e6e69227f2593e7d7c20))
+
 ## [1.5.1](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.5.0...v1.5.1) (2023-11-13)
 
 
