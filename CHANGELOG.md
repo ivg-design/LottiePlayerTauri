@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.6.0...v1.6.1) (2023-11-16)
+
+
+### Bug Fixes
+
+* update lottieinfoparser to use the new parser ([e57d807](https://github.com/ivg-design/LottiePlayerTauri/commit/e57d807a0da04b1e326338af9bbc39c52c0939df))
+
 # [1.6.0](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.5.1...v1.6.0) (2023-11-16)
 
 
