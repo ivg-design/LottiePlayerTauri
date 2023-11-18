@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.6.1...v1.6.2) (2023-11-18)
+
+
+### Bug Fixes
+
+* latest 1.6.2 ([a97ffc6](https://github.com/ivg-design/LottiePlayerTauri/commit/a97ffc63bb404d46d59c4af93af04093495546c1))
+
 ## [1.6.1](https://github.com/ivg-design/LottiePlayerTauri/compare/v1.6.0...v1.6.1) (2023-11-16)
 
 
