@@ -42,66 +42,30 @@
     box-sizing: border-box;
 }
 /* Style adjustments for the tree nodes */
-.node {
+.treeNode {
+    display: flex;
+    flex-direction: column;
+}
+
+.nodeLabel {
     cursor: pointer;
-    fill: #007bff;
-    /* Node color */
-    stroke: #fff;
-    /* Node border color */
+    display: flex;
+    align-items: center;
 }
 
-.node text {
-    font-size: 14px;
-    /* Increased text size */
-    fill: #333;
-    /* A dark color for the text */
+.toggle {
+    width: 20px;
+    /* Ensure space for the toggle even if it's not visible */
 }
 
-.foreignObject div {
-    color: #333;
-    /* Text color inside the foreignObject */
-    font-size: 12px;
-    /* Text size */
-    overflow: hidden;
-    /* Adjust as necessary */
-    width: 100%;
-    /* Ensure the div uses all the allocated space */
-    height: auto;
-    /* Let the height adjust based on content */
-    background: #fff;
-    /* Background to contrast the text */
+.nodeName,
+.nodeDetails {
+    margin-left: 5px;
 }
 
-/* Ensure that SVG text elements are visible */
-.node g text {
-    visibility: visible;
-}
-
-.node circle {
-    fill: #007bff;
-    /* Circle color for nodes */
-    stroke: #fff;
-    /* Circle border color */
-}
-
-.link {
-    fill: none;
-    stroke: #ccc;
-    /* Color of the links/lines between nodes */
-    stroke-width: 2px;
-    /* Width of the links/lines */
-}
-
-/* Additional styling for node focus and interaction */
-.node:hover {
-    fill: #0056b3;
-    /* Change color on hover */
-}
-
-/* Style for foreignObject elements within nodes */
-.foreignObject {
-    overflow: visible;
-    /* Ensure the content is fully visible */
+.childrenContainer {
+    display: flex;
+    flex-direction: column;
 }
 
 /* Add more styling as needed */

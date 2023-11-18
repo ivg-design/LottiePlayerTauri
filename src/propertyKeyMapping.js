@@ -105,23 +105,26 @@ const PropertyKeyMapping = {
         }
     },
     'textLayer': {
-        name: 'Text Layer', ty: 5, type: 'object', properties: {
-            'd': {
-                name: 'Document', type: 'object', properties: {
-                    'k': {
-                        name: 'Keyframes', type: 'object', properties: {
-                            's': {
-                                name: "Selector", type: 'object', properties: {
-                                    "s": { name: 'Size', type: 'integer' },
-                                    "f": { name: 'Font Family', type: 'string' },
-                                    "t": { name: 'Text Content', type: 'string' },
-                                    "ca": { name: 'All Caps', type: 'boolean' },
-                                    "j": { name: 'Justify', type: 'integer' },
-                                    "tr": { name: 'Tracking', type: 'integer' },
-                                    "lh": { name: 'Line Height', type: 'integer' },
-                                    "ls": { name: 'Baseline Shift', type: 'integer' },
-                                    "fc": { name: 'Font Color', type: 'array' },
-                                    "sc": { name: 'Stroke Color', type: 'array' },
+        't': {
+            name: 'Text Layer', ty: 5, type: 'object', properties: {
+                'd': {
+                    name: 'Document', type: 'object', properties: {
+                        'k': {
+                            name: 'Keyframes', type: 'object', properties: {
+                                's': {
+                                    name: "Selector", type: 'object', properties: {
+                                        "s": { name: 'Size', type: 'integer' },
+                                        "f": { name: 'Font Family', type: 'string' },
+                                        "t": { name: 'Text Content', type: 'string' },
+                                        "ca": { name: 'All Caps', type: 'boolean' },
+                                        "j": { name: 'Justify', type: 'integer' },
+                                        "tr": { name: 'Tracking', type: 'integer' },
+                                        "lh": { name: 'Line Height', type: 'integer' },
+                                        "ls": { name: 'Baseline Shift', type: 'integer' },
+                                        "fc": { name: 'Font Color', type: 'array' },
+                                        "sc": { name: 'Stroke Color', type: 'array' },
+
+                                    }
                                 }
                             }
                         }
@@ -132,17 +135,6 @@ const PropertyKeyMapping = {
                 'ind': { name: 'Index', type: 'integer' },
                 't': {
                     name: 'Text', type: 'object', properties: {
-                    }
-                },
-                'tr': {
-                    name: 'Transform', type: 'object', properties: {
-                        'p': { name: 'Position', type: 'array' },
-                        's': { name: 'Scale', type: 'array' },
-                        'r': { name: 'Rotation', type: 'integer' },
-                        'a': { name: 'Anchor Point', type: 'array' },
-                        'o': { name: 'Opacity', type: 'integer' },
-                        'sk': { name: 'Skew', type: 'integer' },
-                        'sa': { name: 'Skew Axis', type: 'integer' }
                     }
                 },
                 'ks': {

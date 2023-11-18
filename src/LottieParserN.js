@@ -138,119 +138,145 @@ const useLottieParser = () => {
             return parsedTransforms;
         };
         // Function to parse shape layers function to parse the shape layer
-        const parseShapeLayer = (layer) => {
-            // a function to parse the properties of a shape layer (including transforms) by mapping them to the propertyKeyMapping
-            const parseShapeLayerProperties = (properties, context = PropertyKeyMapping) => {
-                const parsed = {};
-                for (const key in properties) {
-                    if (!properties.hasOwnProperty(key)) continue;
-
-                    const propertyContext = context.properties ? context.properties[key] : context[key];
-                    if (propertyContext) {
-                        if (propertyContext.type === 'object' && properties[key] !== null && typeof properties[key] === 'object') {
-                            // Recursive parsing for nested objects
-                            parsed[propertyContext.name || key] = parseShapeLayerProperties(properties[key], propertyContext);
-                        } else if (Array.isArray(properties[key])) {
-                            // Recursive parsing for arrays
-                            parsed[propertyContext.name || key] = properties[key].map(item => {
-                                if (typeof item === 'object' && item !== null) {
-                                    return parseShapeLayerProperties(item, propertyContext);
-                                }
-                                return item;
-                            });
-                        } else {
-                            // Direct mapping for simple properties
-                            parsed[propertyContext.name || key] = properties[key];
-                        }
-                    } else {
-                        // Default handling for unmapped keys
-                        if (typeof properties[key] === 'object' && properties[key] !== null) {
-                            // Recursive parsing for unmapped nested objects
-                            parsed[key] = parseShapeLayerProperties(properties[key]);
-                        } else {
-                            parsed[key] = properties[key];
-                        }
-                    }
-                }
-                return parsed;
-            };
-
-
-            const parseShapeProperties = (shape) => {
-                const parsedShape = parseShapeLayerProperties(shape);
-
-                // Special handling for group type 'gr'
-                if (shape.ty === 'gr') {
-                    parsedShape.Items = shape.it
-                        .filter(item => item.ty !== 'tr')
-                        .map(parseShapeProperties);
-
-                    const transformProperties = shape.it.find(item => item.ty === 'tr');
-                    if (transformProperties) {
-                        parsedShape.Transform = parseShapeLayerProperties(transformProperties, PropertyKeyMapping['shapeLayer'].properties['tr'].properties);
-                    }
-                } else {
-                    // For non-group types, additional specific parsing logic can be included here
-                    // This section can handle specific cases unique to non-group types
-                    for (const key in shape) {
-                        if (shape.hasOwnProperty(key) && key !== 'it') {
-                            const propertyInfo = PropertyKeyMapping[key];
-                            if (propertyInfo) {
-                                const propertyName = propertyInfo.name || key;
-                                parsedShape[propertyName] = shape[key];
-                            } else {
-                                // If property is not in mapping, parse it as it is
-                                parsedShape[key] = shape[key];
-                            }
-                        }
-                    }
-                }
-
-                return parsedShape;
-            };
-
-
-
-            return {
-                ...parseLayerTransforms(layer),
-                Shapes: layer.shapes.map(parseShapeProperties)
-            };
-        };
-        //Function to parse text layers
-        const parseTextLayer = (properties, context = PropertyKeyMapping) => {
+    const parseShapeLayer = (layer) => {
+        const parseShapeLayerProperties = (properties, context = PropertyKeyMapping) => {
             const parsed = {};
             for (const key in properties) {
-                if (!properties.hasOwnProperty(key)) continue;
+                if (!properties.hasOwnProperty(key) || ['_render', 'bm', 'cix', 'ix', 'np', 'Hidden'].includes(key)) continue;
 
                 const propertyContext = context.properties ? context.properties[key] : context[key];
                 if (propertyContext) {
                     if (propertyContext.type === 'object' && properties[key] !== null && typeof properties[key] === 'object') {
-                        // Recursive parsing for nested objects
-                        parsed[propertyContext.name || key] = parseTextLayer(properties[key], propertyContext);
+                        parsed[propertyContext.name || key] = parseShapeLayerProperties(properties[key], propertyContext);
                     } else if (Array.isArray(properties[key])) {
-                        // Recursive parsing for arrays
-                        parsed[propertyContext.name || key] = properties[key].map(item => {
-                            if (typeof item === 'object' && item !== null) {
-                                return parseTextLayer(item, propertyContext);
-                            }
-                            return item;
-                        });
+                        parsed[propertyContext.name || key] = properties[key].map(item => parseShapeLayerProperties(item, propertyContext));
                     } else {
-                        // Direct mapping for simple properties
                         parsed[propertyContext.name || key] = properties[key];
                     }
                 } else {
-                    // Default handling for unmapped keys
-                    if (typeof properties[key] === 'object' && properties[key] !== null) {
-                        // Recursive parsing for unmapped nested objects
-                        parsed[key] = parseTextLayer(properties[key]);
-                    } else {
-                        parsed[key] = properties[key];
-                    }
+                    parsed[key] = properties[key];
                 }
             }
             return parsed;
         };
+
+        const parseShapeProperties = (shape) => {
+            const parsedShape = parseShapeLayerProperties(shape);
+
+            if (shape.ty === 'gr') {
+                const groupName = shape.nm || 'Group';
+                parsedShape[groupName] = shape.it
+                    .filter(item => item.ty !== 'tr')
+                    .map(parseShapeProperties);
+
+                const transformProperties = shape.it.find(item => item.ty === 'tr');
+                if (transformProperties) {
+                    parsedShape[groupName].Transform = parseShapeLayerProperties(transformProperties, PropertyKeyMapping['shapeLayer'].properties['tr'].properties);
+                }
+            } else {
+                for (const key in shape) {
+                    if (shape.hasOwnProperty(key) && key !== 'it') {
+                        const propertyInfo = PropertyKeyMapping[key];
+                        if (propertyInfo) {
+                            const propertyName = propertyInfo.name || key;
+                            parsedShape[propertyName] = shape[key];
+                        } else {
+                            parsedShape[key] = shape[key];
+                        }
+                    }
+                }
+            }
+
+            return parsedShape;
+        };
+
+        const parsedShapes = layer.shapes.map(parseShapeProperties);
+        const result = parseLayerTransforms(layer);
+        // Flattening the structure
+        parsedShapes.forEach(shape => {
+            for (const key in shape) {
+                result[key] = shape[key];
+            }
+        });
+
+        return result;
+    };
+
+
+        //Function to parse text layers
+        const parseTextLayer = (layer, context = PropertyKeyMapping.textLayer.t.properties) => {
+            const parsedLayer = {
+                '3D Layer': layer['ddd'] !== undefined ? (layer['ddd'] === 1 ? 'YES' : 'NO') : 'NO', // Display 'YES' for 1, 'NO' otherwise
+                'In Point': layer['ip'],
+                'Index': layer['ind'],
+                'Layer Type': layer['ty'] === 5 ? 'Text' : 'Unknown', // Assuming 'ty' is the key for Layer Type and 5 indicates Text
+                'Name': layer['nm'],
+                'Out Point': layer['op'],
+                'Start Time': layer['st'],
+                'Transform': {} // Transform properties will be filled in later
+            };
+
+            if (layer.t && layer.t.d && Array.isArray(layer.t.d.k)) { // Check if the 'd.k' array exists
+                // Parse the 'd.k' array to extract the 's' object properties
+                parsedLayer.Selectors = layer.t.d.k.map(keyframe => {
+                    // Initialize the object to hold the selector 's' properties
+                    const selector = keyframe.s;
+                    const parsedSelector = {};
+
+                    if (selector) {
+                        // Extract properties from the selector 's'
+                        Object.entries(selector).forEach(([prop, value]) => {
+                            const propertyContext = context.d.properties.k.properties.s.properties[prop];
+                            if (propertyContext) {
+                                // Convert boolean and color array values
+                                switch (propertyContext.type) {
+                                    case 'boolean':
+                                        parsedSelector[propertyContext.name] = !!value;
+                                        break;
+                                    case 'array':
+                                        // Convert color array to RGBA string for color properties
+                                        if (prop === 'fc' || prop === 'sc') {
+                                            parsedSelector[propertyContext.name] = `rgba(${value.map(c => Math.round(c * 255)).join(', ')})`;
+                                        } else {
+                                            parsedSelector[propertyContext.name] = value;
+                                        }
+                                        break;
+                                    default:
+                                        parsedSelector[propertyContext.name] = value;
+                                }
+                            }
+                        });
+                    }
+
+                    return parsedSelector;
+                });
+            }
+
+            // Parse other non-keyframe properties such as 'Hidden', 'Name', and 'Index'
+            ['hd', 'nm', 'ind'].forEach(prop => {
+                if (layer[prop] !== undefined) {
+                    const propertyContext = context[prop];
+                    parsedLayer[propertyContext.name] = layer[prop];
+                }
+            });
+
+            // Parse 'tr' and 'ks' Transform properties, if present
+            ['tr', 'ks'].forEach(transformKey => {
+                if (layer[transformKey]) {
+                    const transformContext = context[transformKey].properties;
+                    parsedLayer.Transform = parsedLayer.Transform || {};
+                    for (const prop in transformContext) {
+                        if (layer[transformKey][prop] !== undefined) {
+                            const value = layer[transformKey][prop];
+                            parsedLayer.Transform[transformContext[prop].name] = value;
+                        }
+                    }
+                }
+            });
+
+            return parsedLayer;
+        };
+
         // Function to determine which layers to parse based on the layer type 
         const parseLayers = (layers, assets) => {
             return layers.map(layer => {
